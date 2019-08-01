@@ -6,4 +6,5 @@ repositories {
 }
 dependencies {
     compile "edu.wpi.first:native-utils:2020.0.4"
+    compile "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:2.0.0"
 }
