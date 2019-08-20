@@ -40,7 +40,9 @@ if (NOT WITHOUT_JAVA)
 
   set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${EJML_JARS})
 
-  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
+  execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil)
+
+  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${CMAKE_BINARY_DIR}/wpiutil/generated/*.java)
   add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} OUTPUT_NAME wpiutil)
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
@@ -63,6 +65,8 @@ endif()
 GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp)
+file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
+file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB uv_native_src src/main/native/libuv/src/*.cpp)
 
@@ -128,7 +132,7 @@ if (NOT USE_VCPKG_LIBUV)
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/libuv/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
     if(NOT MSVC)
-        target_sources(wpiutil PRIVATE ${uv_unix_src})
+        target_sources(wpiutil PRIVATE ${wpiutil_unix_src} ${uv_unix_src})
         if (APPLE)
             target_sources(wpiutil PRIVATE ${uv_darwin_src})
         else()
@@ -136,7 +140,7 @@ if (NOT USE_VCPKG_LIBUV)
         endif()
         target_compile_definitions(wpiutil PRIVATE -D_GNU_SOURCE)
     else()
-        target_sources(wpiutil PRIVATE ${uv_windows_src})
+        target_sources(wpiutil PRIVATE ${wpiutil_windows_src} ${uv_windows_src})
         if(BUILD_SHARED_LIBS)
             target_compile_definitions(wpiutil PRIVATE -DBUILDING_UV_SHARED)
         endif()

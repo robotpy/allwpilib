@@ -23,6 +23,16 @@
     "mainclass": "Main"
   },
   {
+    "name": "Arcade Drive",
+    "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive.",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "arcadedrive",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
     "name": "Mecanum Drive",
     "description": "Demonstrate the use of the RobotDrive class doing teleop driving with Mecanum steering",
     "tags": [
@@ -118,6 +128,32 @@
       "Joystick"
     ],
     "foldername": "potentiometerpid",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Elevator with trapezoid profiled PID",
+    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
+    "tags": [
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "elevatortrapezoidprofile",
+    "gradlebase": "java",
+    "mainclass": "Main"
+  },
+  {
+    "name": "Elevator with profiled PID controller",
+    "description": "An example to demonstrate the use of an encoder and trapezoid profiled PID control to reach elevator position setpoints.",
+    "tags": [
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "elevatorprofiledpid",
     "gradlebase": "java",
     "mainclass": "Main"
   },
