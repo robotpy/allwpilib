@@ -30,6 +30,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - [ARM Compiler Toolchain](https://github.com/wpilibsuite/toolchain-builder/releases)
   * Note that for 2019 and beyond, you should use version 6 or greater of GCC
 - Doxygen (Only required if you want to build the C++ documentation)
+- Java 11 JDK
 
 ## Setup
 
