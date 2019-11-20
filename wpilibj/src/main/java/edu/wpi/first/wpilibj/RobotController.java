@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -49,6 +49,18 @@ public final class RobotController {
    *
    * @return The current time in microseconds according to the FPGA.
    */
+  public static long getFPGATimeMicroSeconds() {
+    return HALUtil.getFPGATime();
+  }
+
+  /**
+   * Read the microsecond timer from the FPGA.
+   *
+   * @return The current time in microseconds according to the FPGA.
+   * @deprecated Use {@link getFPGATimeMicroSeconds} instead.
+   */
+  @Deprecated(since = "2020")
+  @SuppressWarnings("AbbreviationAsWordInName")
   public static long getFPGATime() {
     return HALUtil.getFPGATime();
   }
@@ -104,6 +116,17 @@ public final class RobotController {
    *
    * @return The controller input current value in Amps
    */
+  public static double getInputCurrentAmps() {
+    return PowerJNI.getVinCurrent();
+  }
+
+  /**
+   * Get the input current to the robot controller.
+   *
+   * @return The controller input current value in Amps
+   * @deprecated Use {@link getInputCurrentAmps} instead.
+   */
+  @Deprecated(since = "2020")
   public static double getInputCurrent() {
     return PowerJNI.getVinCurrent();
   }
@@ -120,8 +143,19 @@ public final class RobotController {
   /**
    * Get the current output of the 3.3V rail.
    *
-   * @return The controller 3.3V rail output current value in Volts
+   * @return The controller 3.3V rail output current value in Amps
    */
+  public static double getCurrent3V3Amps() {
+    return PowerJNI.getUserCurrent3V3();
+  }
+
+  /**
+   * Get the current output of the 3.3V rail.
+   *
+   * @return The controller 3.3V rail output current value in Amps
+   * @deprecated Use {@link getCurrent3V3Amps} instead.
+   */
+  @Deprecated(since = "2020")
   public static double getCurrent3V3() {
     return PowerJNI.getUserCurrent3V3();
   }
@@ -159,6 +193,17 @@ public final class RobotController {
    *
    * @return The controller 5V rail output current value in Amps
    */
+  public static double getCurrent5VAmps() {
+    return PowerJNI.getUserCurrent5V();
+  }
+
+  /**
+   * Get the current output of the 5V rail.
+   *
+   * @return The controller 5V rail output current value in Amps
+   * @deprecated Use {@link getCurrent5VAmps} instead.
+   */
+  @Deprecated(since = "2020")
   public static double getCurrent5V() {
     return PowerJNI.getUserCurrent5V();
   }
@@ -196,6 +241,17 @@ public final class RobotController {
    *
    * @return The controller 6V rail output current value in Amps
    */
+  public static double getCurrent6VAmps() {
+    return PowerJNI.getUserCurrent6V();
+  }
+
+  /**
+   * Get the current output of the 6V rail.
+   *
+   * @return The controller 6V rail output current value in Amps
+   * @deprecated Use {@link getCurrent6VAmps} instead.
+   */
+  @Deprecated(since = "2020")
   public static double getCurrent6V() {
     return PowerJNI.getUserCurrent6V();
   }

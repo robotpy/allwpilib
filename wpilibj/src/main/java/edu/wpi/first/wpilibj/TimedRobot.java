@@ -66,7 +66,7 @@ public class TimedRobot extends IterativeRobotBase {
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
-    m_expirationTime = RobotController.getFPGATime() * 1e-6 + m_period;
+    m_expirationTime = RobotController.getFPGATimeMicroSeconds() * 1e-6 + m_period;
     updateAlarm();
 
     // Loop forever, calling the appropriate mode-dependent function

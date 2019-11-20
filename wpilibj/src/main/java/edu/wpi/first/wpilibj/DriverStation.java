@@ -862,17 +862,17 @@ public class DriverStation {
    * @return true if there is new data, otherwise false
    */
   public boolean waitForData(double timeout) {
-    long startTime = RobotController.getFPGATime();
-    long timeoutMicros = (long) (timeout * 1000000);
+    long startTimeMicroS = RobotController.getFPGATimeMicroSeconds();
+    long timeoutMicroS = (long) (timeout * 1000000);
     m_waitForDataMutex.lock();
     try {
       int currentCount = m_waitForDataCount;
       while (m_waitForDataCount == currentCount) {
         if (timeout > 0) {
-          long now = RobotController.getFPGATime();
-          if (now < startTime + timeoutMicros) {
+          long nowMicroS = RobotController.getFPGATimeMicroSeconds();
+          if (nowMicroS < startTimeMicroS + timeoutMicroS) {
             // We still have time to wait
-            boolean signaled = m_waitForDataCond.await(startTime + timeoutMicros - now,
+            boolean signaled = m_waitForDataCond.await(startTimeMicroS + timeoutMicroS - nowMicroS,
                                                 TimeUnit.MICROSECONDS);
             if (!signaled) {
               // Return false if a timeout happened
@@ -901,7 +901,7 @@ public class DriverStation {
    * but does send an approximate match time. The value will count down the time remaining in the
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
    * dispute ref calls or guarantee that a function will trigger before the match ends) The
-   * Practice Match function of the DS approximates the behaviour seen on the field.
+   * Practice Match function of the DS approximates the behavior seen on the field.
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */

@@ -22,15 +22,15 @@ public class Notifier implements AutoCloseable {
   // The C pointer to the notifier object. We don't use it directly, it is
   // just passed to the JNI bindings.
   private final AtomicInteger m_notifier = new AtomicInteger();
-  // The time, in microseconds, at which the corresponding handler should be
-  // called. Has the same zero as Utility.getFPGATime().
+  // The time, in seconds, at which the corresponding handler should be
+  // called. Has the same zero as RobotController.getFPGATime().
   private double m_expirationTime;
   // The handler passed in by the user which should be called at the
   // appropriate interval.
   private Runnable m_handler;
   // Whether we are calling the handler just once or periodically.
   private boolean m_periodic;
-  // If periodic, the period of the calling; if just once, stores how long it
+  // If periodic, the period of the calling in seconds; if just once, stores how long it
   // is until we call the handler.
   private double m_period;
 
@@ -63,14 +63,14 @@ public class Notifier implements AutoCloseable {
   /**
    * Update the alarm hardware to reflect the next alarm.
    *
-   * @param triggerTime the time at which the next alarm will be triggered
+   * @param triggerTime the time at which the next alarm will be triggered in microseconds
    */
-  private void updateAlarm(long triggerTime) {
+  private void updateAlarm(long triggerTimeMicroSeconds) {
     int notifier = m_notifier.get();
     if (notifier == 0) {
       return;
     }
-    NotifierJNI.updateNotifierAlarm(notifier, triggerTime);
+    NotifierJNI.updateNotifierAlarm(notifier, triggerTimeMicroSeconds);
   }
 
   /**
@@ -173,7 +173,7 @@ public class Notifier implements AutoCloseable {
     try {
       m_periodic = false;
       m_period = delay;
-      m_expirationTime = RobotController.getFPGATime() * 1e-6 + delay;
+      m_expirationTime = RobotController.getFPGATimeMicroSeconds() * 1e-6 + delay;
       updateAlarm();
     } finally {
       m_processLock.unlock();
@@ -193,7 +193,7 @@ public class Notifier implements AutoCloseable {
     try {
       m_periodic = true;
       m_period = period;
-      m_expirationTime = RobotController.getFPGATime() * 1e-6 + period;
+      m_expirationTime = RobotController.getFPGATimeMicroSeconds() * 1e-6 + period;
       updateAlarm();
     } finally {
       m_processLock.unlock();
