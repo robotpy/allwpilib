@@ -6,5 +6,5 @@ repositories {
 }
 dependencies {
     implementation "edu.wpi.first:native-utils:2020.5.2"
-    implementation "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:2.0.0"
+    implementation "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:3.0.0"
 }
