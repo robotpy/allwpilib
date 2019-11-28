@@ -14,11 +14,10 @@
 
 #include "frc/AnalogTriggerType.h"
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
 
-class InterruptableSensorBase : public ErrorBase, public SendableBase {
+class InterruptableSensorBase : public ErrorBase {
  public:
   enum WaitResult {
     kTimeout = 0x0,
@@ -41,8 +40,8 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
    */
   virtual ~InterruptableSensorBase();
 
-  InterruptableSensorBase(InterruptableSensorBase&&);
-  InterruptableSensorBase& operator=(InterruptableSensorBase&&);
+  InterruptableSensorBase(InterruptableSensorBase&&) = default;
+  InterruptableSensorBase& operator=(InterruptableSensorBase&&) = default;
 
   virtual HAL_Handle GetPortHandleForRouting() const = 0;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
@@ -144,7 +143,7 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
   virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
  protected:
-  HAL_InterruptHandle m_interrupt{HAL_kInvalidHandle};
+  hal::Handle<HAL_InterruptHandle> m_interrupt;
   std::unique_ptr<InterruptEventHandler> m_interruptHandler{nullptr};
 
   void AllocateInterrupts(bool watcher);

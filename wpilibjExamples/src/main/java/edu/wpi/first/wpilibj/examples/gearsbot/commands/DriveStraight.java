@@ -7,10 +7,10 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 
-import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
 
 /**
  * Drive the given distance straight (negative values go backwards). Uses a
@@ -18,45 +18,36 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * command is running. The input is the averaged values of the left and right
  * encoders.
  */
-public class DriveStraight extends Command {
-  private final PIDController m_pid = new PIDController(4, 0, 0);
+public class DriveStraight extends PIDCommand {
+  private final DriveTrain m_drivetrain;
 
   /**
    * Create a new DriveStraight command.
    * @param distance The distance to drive
    */
-  public DriveStraight(double distance) {
-    requires(Robot.m_drivetrain);
+  public DriveStraight(double distance, DriveTrain drivetrain) {
+    super(new PIDController(4, 0, 0),
+        drivetrain::getDistance,
+        distance,
+        d -> drivetrain.drive(d, d));
 
-    m_pid.setAbsoluteTolerance(0.01);
-    m_pid.setSetpoint(distance);
+    m_drivetrain = drivetrain;
+    addRequirements(m_drivetrain);
+
+    getController().setTolerance(0.01);
   }
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {
+  public void initialize() {
     // Get everything in a safe starting state.
-    Robot.m_drivetrain.reset();
-    m_pid.reset();
-  }
-
-  @Override
-  protected void execute() {
-    double pidOut = m_pid.calculate(Robot.m_drivetrain.getDistance());
-
-    Robot.m_drivetrain.drive(pidOut, pidOut);
+    m_drivetrain.reset();
+    super.initialize();
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
-  protected boolean isFinished() {
-    return m_pid.atSetpoint();
-  }
-
-  // Called once after isFinished returns true
-  @Override
-  protected void end() {
-    // Stop the wheels
-    Robot.m_drivetrain.drive(0, 0);
+  public boolean isFinished() {
+    return getController().atSetpoint();
   }
 }

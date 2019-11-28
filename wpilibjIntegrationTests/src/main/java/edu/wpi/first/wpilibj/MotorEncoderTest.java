@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
+import edu.wpi.first.wpiutil.math.MathUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class MotorEncoderTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(MotorEncoderTest.class.getName());
 
-  private static final double MOTOR_RUNTIME = .25;
+  private static final double MOTOR_RUNTIME = 0.25;
 
   // private static final List<MotorEncoderFixture> pairs = new
   // ArrayList<MotorEncoderFixture>();
@@ -108,7 +109,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testIncrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(.2);
+    me.getMotor().set(0.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not incremented: start: " + startValue + "; current: "
@@ -124,7 +125,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testDecrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(-.2);
+    me.getMotor().set(-0.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not decremented: start: " + startValue + "; current: "
@@ -139,7 +140,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     final int counter1Start = me.getCounters()[0].get();
     final int counter2Start = me.getCounters()[1].get();
 
-    me.getMotor().set(.75);
+    me.getMotor().set(0.75);
     Timer.delay(MOTOR_RUNTIME);
     int counter1End = me.getCounters()[0].get();
     int counter2End = me.getCounters()[1].get();
@@ -177,12 +178,14 @@ public class MotorEncoderTest extends AbstractComsSetup {
   @Test
   public void testPositionPIDController() {
     PIDController pidController = new PIDController(0.001, 0.0005, 0);
-    pidController.setAbsoluteTolerance(50.0);
-    pidController.setOutputRange(-0.2, 0.2);
+    pidController.setTolerance(50.0);
+    pidController.setIntegratorRange(-0.2, 0.2);
     pidController.setSetpoint(1000);
 
-    Notifier pidRunner = new Notifier(
-        () -> me.getMotor().set(pidController.calculate(me.getEncoder().getDistance())));
+    Notifier pidRunner = new Notifier(() -> {
+      var speed = pidController.calculate(me.getEncoder().getDistance());
+      me.getMotor().set(MathUtils.clamp(speed, -0.2, 0.2));
+    });
 
     pidRunner.startPeriodic(pidController.getPeriod());
     Timer.delay(10.0);
@@ -192,19 +195,20 @@ public class MotorEncoderTest extends AbstractComsSetup {
         "PID loop did not reach reference within 10 seconds. The current error was" + pidController
             .getPositionError(), pidController.atSetpoint());
 
-    pidController.close();
+    pidRunner.close();
   }
 
   @Test
   public void testVelocityPIDController() {
     LinearFilter filter = LinearFilter.movingAverage(50);
     PIDController pidController = new PIDController(1e-5, 0.0, 0.0006);
-    pidController.setAbsoluteTolerance(200);
-    pidController.setOutputRange(-0.3, 0.3);
+    pidController.setTolerance(200);
     pidController.setSetpoint(600);
 
-    Notifier pidRunner =
-        new Notifier(() -> me.getMotor().set(filter.calculate(me.getEncoder().getRate()) + 8e-5));
+    Notifier pidRunner = new Notifier(() -> {
+      var speed = filter.calculate(me.getEncoder().getRate());
+      me.getMotor().set(MathUtils.clamp(speed, -0.3, 0.3));
+    });
 
     pidRunner.startPeriodic(pidController.getPeriod());
     Timer.delay(10.0);
@@ -213,7 +217,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     assertTrue("PID loop did not reach reference within 10 seconds. The error was: " + pidController
         .getPositionError(), pidController.atSetpoint());
 
-    pidController.close();
+    pidRunner.close();
   }
 
   /**

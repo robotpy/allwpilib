@@ -1,0 +1,46 @@
+# Testing steps for real hardware
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+
+jobs:
+- job: TestBench
+  pool: RoboRioConnections
+  timeoutInMinutes: 60
+  workspace:
+    clean: all
+  steps:
+    - task: Gradle@2
+      condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
+        options: '-Ponlylinuxathena -PbuildServer'
+
+    - task: ShellScript@2
+      displayName: Run Tests & Get Results
+      inputs:
+        scriptPath: test-scripts/jenkins-run-tests-get-results.sh
+
+    - task: PublishTestResults@2
+      displayName: Publish C++ Test Results
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'cpp*.xml'
+        testRunTitle: 'C++ Test Report'
+        searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
+
+    - task: PublishTestResults@2
+      displayName: Publish Java Test Results
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'java*.xml'
+        testRunTitle: 'Java Test Report'
+        searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'

@@ -11,17 +11,19 @@
 #include <string>
 #include <vector>
 
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/smartdashboard/ListenerExecutor.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class Sendable;
-
-class SmartDashboard : public ErrorBase, public SendableBase {
+class SmartDashboard : public ErrorBase,
+                       public Sendable,
+                       public SendableHelper<SmartDashboard> {
  public:
   static void init();
 
@@ -96,10 +98,23 @@ class SmartDashboard : public ErrorBase, public SendableBase {
   static void Delete(wpi::StringRef key);
 
   /**
+   * Returns an NT Entry mapping to the specified key
+   *
+   * This is useful if an entry is used often, or is read and then modified.
+   *
+   * @param key the key
+   * @return    the entry for the key
+   */
+  static nt::NetworkTableEntry GetEntry(wpi::StringRef key);
+
+  /**
    * Maps the specified key to the specified value in this table.
    *
    * The value can be retrieved by calling the get method with a key that is
    * equal to the original key.
+   *
+   * In order for the value to appear in the dashboard, it must be registered
+   * with SendableRegistry.  WPILib components do this automatically.
    *
    * @param keyName the key
    * @param value   the value
@@ -112,6 +127,9 @@ class SmartDashboard : public ErrorBase, public SendableBase {
    *
    * The value can be retrieved by calling the get method with a key that is
    * equal to the original key.
+   *
+   * In order for the value to appear in the dashboard, it must be registered
+   * with SendableRegistry.  WPILib components do this automatically.
    *
    * @param value the value
    */

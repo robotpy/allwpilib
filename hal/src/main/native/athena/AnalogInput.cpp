@@ -75,6 +75,9 @@ HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
   return channel < kNumAnalogInputs && channel >= 0;
 }
 
+void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
+                                 HAL_SimDeviceHandle device) {}
+
 void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need double comparison with epsilon.
@@ -195,6 +198,14 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
   int32_t LSBWeight = HAL_GetAnalogLSBWeight(analogPortHandle, status);
   int32_t offset = HAL_GetAnalogOffset(analogPortHandle, status);
   double voltage = LSBWeight * 1.0e-9 * value - offset * 1.0e-9;
+  return voltage;
+}
+
+double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,
+                                 int32_t rawValue, int32_t* status) {
+  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analogPortHandle, status);
+  int32_t offset = HAL_GetAnalogOffset(analogPortHandle, status);
+  double voltage = LSBWeight * 1.0e-9 * rawValue - offset * 1.0e-9;
   return voltage;
 }
 

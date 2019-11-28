@@ -8,7 +8,10 @@
 #pragma once
 
 #include <units/units.h>
-#include <wpi/math>
+
+namespace wpi {
+class json;
+}  // namespace wpi
 
 namespace frc {
 
@@ -28,7 +31,7 @@ class Rotation2d {
    *
    * @param value The value of the angle in radians.
    */
-  explicit Rotation2d(units::radian_t value);
+  Rotation2d(units::radian_t value);  // NOLINT(runtime/explicit)
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
@@ -98,6 +101,30 @@ class Rotation2d {
   Rotation2d operator-() const;
 
   /**
+   * Multiplies the current rotation by a scalar.
+   * @param scalar The scalar.
+   *
+   * @return The new scaled Rotation2d.
+   */
+  Rotation2d operator*(double scalar) const;
+
+  /**
+   * Checks equality between this Rotation2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Rotation2d& other) const;
+
+  /**
+   * Checks inequality between this Rotation2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
+  bool operator!=(const Rotation2d& other) const;
+
+  /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
    * [cos_new]   [other.cos, -other.sin][cos]
@@ -151,4 +178,9 @@ class Rotation2d {
   double m_cos = 1;
   double m_sin = 0;
 };
+
+void to_json(wpi::json& json, const Rotation2d& rotation);
+
+void from_json(const wpi::json& json, Rotation2d& rotation);
+
 }  // namespace frc

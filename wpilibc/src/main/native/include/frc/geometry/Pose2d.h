@@ -11,6 +11,10 @@
 #include "Translation2d.h"
 #include "Twist2d.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 /**
@@ -69,6 +73,30 @@ class Pose2d {
   Pose2d& operator+=(const Transform2d& other);
 
   /**
+   * Returns the Transform2d that maps the one pose to another.
+   *
+   * @param other The initial pose of the transformation.
+   * @return The transform that maps the other pose to the current pose.
+   */
+  Transform2d operator-(const Pose2d& other) const;
+
+  /**
+   * Checks equality between this Pose2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Pose2d& other) const;
+
+  /**
+   * Checks inequality between this Pose2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
+  bool operator!=(const Pose2d& other) const;
+
+  /**
    * Returns the underlying translation.
    *
    * @return Reference to the translational component of the pose.
@@ -122,15 +150,30 @@ class Pose2d {
    *
    * @param twist The change in pose in the robot's coordinate frame since the
    * previous pose update. For example, if a non-holonomic robot moves forward
-   * 0.01 meters and changes angle by .5 degrees since the previous pose update,
-   * the twist would be Twist2d{0.01, 0.0, toRadians(0.5)}
+   * 0.01 meters and changes angle by 0.5 degrees since the previous pose
+   * update, the twist would be Twist2d{0.01, 0.0, toRadians(0.5)}
    *
    * @return The new pose of the robot.
    */
   Pose2d Exp(const Twist2d& twist) const;
 
+  /**
+   * Returns a Twist2d that maps this pose to the end pose. If c is the output
+   * of a.Log(b), then a.Exp(c) would yield b.
+   *
+   * @param end The end pose for the transformation.
+   *
+   * @return The twist that maps this to end.
+   */
+  Twist2d Log(const Pose2d& end) const;
+
  private:
   Translation2d m_translation;
   Rotation2d m_rotation;
 };
+
+void to_json(wpi::json& json, const Pose2d& pose);
+
+void from_json(const wpi::json& json, Pose2d& pose);
+
 }  // namespace frc

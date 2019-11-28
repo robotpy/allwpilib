@@ -40,3 +40,27 @@ TEST(Pose2dTest, RelativeTo) {
   EXPECT_NEAR(finalRelativeToInitial.Rotation().Degrees().to<double>(), 0.0,
               kEpsilon);
 }
+
+TEST(Pose2dTest, Equality) {
+  const Pose2d a{0_m, 5_m, Rotation2d(43_deg)};
+  const Pose2d b{0_m, 5_m, Rotation2d(43_deg)};
+  EXPECT_TRUE(a == b);
+}
+
+TEST(Pose2dTest, Inequality) {
+  const Pose2d a{0_m, 5_m, Rotation2d(43_deg)};
+  const Pose2d b{0_m, 5_ft, Rotation2d(43_deg)};
+  EXPECT_TRUE(a != b);
+}
+
+TEST(Pose2dTest, Minus) {
+  const Pose2d initial{0_m, 0_m, Rotation2d(45.0_deg)};
+  const Pose2d final{5_m, 5_m, Rotation2d(45.0_deg)};
+
+  const auto transform = final - initial;
+
+  EXPECT_NEAR(transform.Translation().X().to<double>(), 5.0 * std::sqrt(2.0),
+              kEpsilon);
+  EXPECT_NEAR(transform.Translation().Y().to<double>(), 0.0, kEpsilon);
+  EXPECT_NEAR(transform.Rotation().Degrees().to<double>(), 0.0, kEpsilon);
+}

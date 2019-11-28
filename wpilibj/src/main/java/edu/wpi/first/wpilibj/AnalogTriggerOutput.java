@@ -40,7 +40,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * the averaging engine may help with this, but rotational speeds of the sensor will then be
  * limited.
  */
-public class AnalogTriggerOutput extends DigitalSource {
+public class AnalogTriggerOutput extends DigitalSource implements Sendable {
   /**
    * Exceptions dealing with improper operation of the Analog trigger output.
    */
@@ -74,7 +74,7 @@ public class AnalogTriggerOutput extends DigitalSource {
     m_trigger = trigger;
     m_outputType = outputType;
     HAL.report(tResourceType.kResourceType_AnalogTriggerOutput,
-        trigger.getIndex(), outputType.value);
+        trigger.getIndex() + 1, outputType.value + 1);
   }
 
   /**
@@ -98,7 +98,7 @@ public class AnalogTriggerOutput extends DigitalSource {
 
   @Override
   public int getChannel() {
-    return m_trigger.m_index;
+    return m_trigger.getIndex();
   }
 
   @Override

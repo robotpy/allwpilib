@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
  * profile.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class ProfiledPIDController extends SendableBase {
+public class ProfiledPIDController implements Sendable {
   private PIDController m_controller;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -139,7 +139,16 @@ public class ProfiledPIDController extends SendableBase {
   /**
    * Sets the goal for the ProfiledPIDController.
    *
-   * @param goal The desired unprofiled setpoint.
+   * @param goal The desired goal state.
+   */
+  public void setGoal(TrapezoidProfile.State goal) {
+    m_goal = goal;
+  }
+
+  /**
+   * Sets the goal for the ProfiledPIDController.
+   *
+   * @param goal The desired goal position.
    */
   public void setGoal(double goal) {
     m_goal = new TrapezoidProfile.State(goal, 0);
@@ -148,48 +157,8 @@ public class ProfiledPIDController extends SendableBase {
   /**
    * Gets the goal for the ProfiledPIDController.
    */
-  public double getGoal() {
-    return m_goal.position;
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   */
-  public boolean atGoal(double positionTolerance) {
-    return atGoal(positionTolerance, Double.POSITIVE_INFINITY, PIDController.Tolerance.kAbsolute);
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   */
-  public boolean atGoal(double positionTolerance, double velocityTolerance) {
-    return atGoal(positionTolerance, velocityTolerance, PIDController.Tolerance.kAbsolute);
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  public boolean atGoal(
-      double positionTolerance,
-      double velocityTolerance,
-      PIDController.Tolerance toleranceType) {
-    return atSetpoint(positionTolerance, velocityTolerance, toleranceType)
-        && m_goal.equals(m_setpoint);
+  public TrapezoidProfile.State getGoal() {
+    return m_goal;
   }
 
   /**
@@ -215,48 +184,8 @@ public class ProfiledPIDController extends SendableBase {
    *
    * @return The current setpoint.
    */
-  public double getSetpoint() {
-    return m_controller.getSetpoint();
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   */
-  public boolean atSetpoint(double positionTolerance) {
-    return atSetpoint(positionTolerance, Double.POSITIVE_INFINITY,
-        PIDController.Tolerance.kAbsolute);
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   */
-  public boolean atSetpoint(double positionTolerance, double velocityTolerance) {
-    return atSetpoint(positionTolerance, velocityTolerance, PIDController.Tolerance.kAbsolute);
-  }
-
-  /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * <p>This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  public boolean atSetpoint(
-      double positionTolerance,
-      double velocityTolerance,
-      PIDController.Tolerance toleranceType) {
-    return m_controller.atSetpoint(positionTolerance, velocityTolerance, toleranceType);
+  public TrapezoidProfile.State getSetpoint() {
+    return m_setpoint;
   }
 
   /**
@@ -266,16 +195,6 @@ public class ProfiledPIDController extends SendableBase {
    */
   public boolean atSetpoint() {
     return m_controller.atSetpoint();
-  }
-
-  /**
-   * Sets the minimum and maximum values expected from the input.
-   *
-   * @param minimumInput The minimum value expected from the input.
-   * @param maximumInput The maximum value expected from the input.
-   */
-  public void setInputRange(double minimumInput, double maximumInput) {
-    m_controller.setInputRange(minimumInput, maximumInput);
   }
 
   /**
@@ -300,57 +219,35 @@ public class ProfiledPIDController extends SendableBase {
   }
 
   /**
-   * Sets the minimum and maximum values to write.
+   * Sets the minimum and maximum values for the integrator.
    *
-   * @param minimumOutput the minimum value to write to the output
-   * @param maximumOutput the maximum value to write to the output
+   * <p>When the cap is reached, the integrator value is added to the controller
+   * output rather than the integrator value times the integral gain.
+   *
+   * @param minimumIntegral The minimum value of the integrator.
+   * @param maximumIntegral The maximum value of the integrator.
    */
-  public void setOutputRange(double minimumOutput, double maximumOutput) {
-    m_controller.setOutputRange(minimumOutput, maximumOutput);
+  public void setIntegratorRange(double minimumIntegral, double maximumIntegral) {
+    m_controller.setIntegratorRange(minimumIntegral, maximumIntegral);
   }
 
   /**
-   * Sets the absolute error which is considered tolerable for use with
-   * atSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   */
-  public void setAbsoluteTolerance(double positionTolerance) {
-    setAbsoluteTolerance(positionTolerance, Double.POSITIVE_INFINITY);
-  }
-
-  /**
-   * Sets the absolute error which is considered tolerable for use with
-   * atSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velocityTolerance Velocity error which is tolerable.
-   */
-  public void setAbsoluteTolerance(double positionTolerance, double velocityTolerance) {
-    m_controller.setAbsoluteTolerance(positionTolerance, velocityTolerance);
-  }
-
-  /**
-   * Sets the percent error which is considered tolerable for use with
-   * atSetpoint().
+   * Sets the error which is considered tolerable for use with atSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    */
-  public void setPercentTolerance(double positionTolerance) {
-    m_controller.setPercentTolerance(positionTolerance, Double.POSITIVE_INFINITY);
+  public void setTolerance(double positionTolerance) {
+    setTolerance(positionTolerance, Double.POSITIVE_INFINITY);
   }
 
   /**
-   * Sets the percent error which is considered tolerable for use with
-   * atSetpoint().
+   * Sets the error which is considered tolerable for use with atSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    * @param velocityTolerance Velocity error which is tolerable.
    */
-  public void setPercentTolerance(
-      double positionTolerance,
-      double velocityTolerance) {
-    m_controller.setPercentTolerance(positionTolerance, velocityTolerance);
+  public void setTolerance(double positionTolerance, double velocityTolerance) {
+    m_controller.setTolerance(positionTolerance, velocityTolerance);
   }
 
   /**
@@ -386,6 +283,17 @@ public class ProfiledPIDController extends SendableBase {
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
    */
+  public double calculate(double measurement, TrapezoidProfile.State goal) {
+    setGoal(goal);
+    return calculate(measurement);
+  }
+
+  /**
+   * Returns the next output of the PIDController.
+   *
+   * @param measurement The current measurement of the process variable.
+   * @param goal The new goal of the controller.
+   */
   public double calculate(double measurement, double goal) {
     setGoal(goal);
     return calculate(measurement);
@@ -398,7 +306,7 @@ public class ProfiledPIDController extends SendableBase {
    * @param goal        The new goal of the controller.
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  public double calculate(double measurement, double goal,
+  public double calculate(double measurement, TrapezoidProfile.State goal,
                    TrapezoidProfile.Constraints constraints) {
     setConstraints(constraints);
     return calculate(measurement, goal);
@@ -417,6 +325,6 @@ public class ProfiledPIDController extends SendableBase {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty("goal", this::getGoal, this::setGoal);
+    builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
   }
 }

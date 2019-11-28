@@ -10,11 +10,12 @@
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <wpi/math>
 
 #include "frc/SpeedController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -28,33 +29,36 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                              SpeedController& rightMotor,
                              SpeedController& backMotor, double leftMotorAngle,
                              double rightMotorAngle, double backMotorAngle)
-    : m_leftMotor(leftMotor), m_rightMotor(rightMotor), m_backMotor(backMotor) {
+    : m_leftMotor(&leftMotor),
+      m_rightMotor(&rightMotor),
+      m_backMotor(&backMotor) {
   m_leftVec = {std::cos(leftMotorAngle * (wpi::math::pi / 180.0)),
                std::sin(leftMotorAngle * (wpi::math::pi / 180.0))};
   m_rightVec = {std::cos(rightMotorAngle * (wpi::math::pi / 180.0)),
                 std::sin(rightMotorAngle * (wpi::math::pi / 180.0))};
   m_backVec = {std::cos(backMotorAngle * (wpi::math::pi / 180.0)),
                std::sin(backMotorAngle * (wpi::math::pi / 180.0))};
-  AddChild(&m_leftMotor);
-  AddChild(&m_rightMotor);
-  AddChild(&m_backMotor);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddChild(this, m_leftMotor);
+  registry.AddChild(this, m_rightMotor);
+  registry.AddChild(this, m_backMotor);
   static int instances = 0;
   ++instances;
-  SetName("KilloughDrive", instances);
+  registry.AddLW(this, "KilloughDrive", instances);
 }
 
 void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
                                    double zRotation, double gyroAngle) {
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 3,
-               HALUsageReporting::kRobotDrive2_KilloughCartesian);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive2_KilloughCartesian, 3);
     reported = true;
   }
 
-  ySpeed = Limit(ySpeed);
+  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
   ySpeed = ApplyDeadband(ySpeed, m_deadband);
 
-  xSpeed = Limit(xSpeed);
+  xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
   // Compensate for gyro angle.
@@ -68,9 +72,9 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
 
   Normalize(wheelSpeeds);
 
-  m_leftMotor.Set(wheelSpeeds[kLeft] * m_maxOutput);
-  m_rightMotor.Set(wheelSpeeds[kRight] * m_maxOutput);
-  m_backMotor.Set(wheelSpeeds[kBack] * m_maxOutput);
+  m_leftMotor->Set(wheelSpeeds[kLeft] * m_maxOutput);
+  m_rightMotor->Set(wheelSpeeds[kRight] * m_maxOutput);
+  m_backMotor->Set(wheelSpeeds[kBack] * m_maxOutput);
 
   Feed();
 }
@@ -78,8 +82,8 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
 void KilloughDrive::DrivePolar(double magnitude, double angle,
                                double zRotation) {
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 3,
-               HALUsageReporting::kRobotDrive2_KilloughPolar);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive2_KilloughPolar, 3);
     reported = true;
   }
 
@@ -89,9 +93,9 @@ void KilloughDrive::DrivePolar(double magnitude, double angle,
 }
 
 void KilloughDrive::StopMotor() {
-  m_leftMotor.StopMotor();
-  m_rightMotor.StopMotor();
-  m_backMotor.StopMotor();
+  m_leftMotor->StopMotor();
+  m_rightMotor->StopMotor();
+  m_backMotor->StopMotor();
   Feed();
 }
 
@@ -104,12 +108,12 @@ void KilloughDrive::InitSendable(SendableBuilder& builder) {
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty("Left Motor Speed",
-                            [=]() { return m_leftMotor.Get(); },
-                            [=](double value) { m_leftMotor.Set(value); });
+                            [=]() { return m_leftMotor->Get(); },
+                            [=](double value) { m_leftMotor->Set(value); });
   builder.AddDoubleProperty("Right Motor Speed",
-                            [=]() { return m_rightMotor.Get(); },
-                            [=](double value) { m_rightMotor.Set(value); });
+                            [=]() { return m_rightMotor->Get(); },
+                            [=](double value) { m_rightMotor->Set(value); });
   builder.AddDoubleProperty("Back Motor Speed",
-                            [=]() { return m_backMotor.Get(); },
-                            [=](double value) { m_backMotor.Set(value); });
+                            [=]() { return m_backMotor->Get(); },
+                            [=](double value) { m_backMotor->Set(value); });
 }

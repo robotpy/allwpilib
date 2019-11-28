@@ -12,17 +12,17 @@
 
 #include <units/units.h>
 
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc2 {
 
 /**
  * Implements a PID control loop.
  */
-class PIDController : public frc::SendableBase {
+class PIDController : public frc::Sendable,
+                      public frc::SendableHelper<PIDController> {
  public:
-  enum class Tolerance { kAbsolute, kPercent };
-
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
    *
@@ -117,33 +117,11 @@ class PIDController : public frc::SendableBase {
   double GetSetpoint() const;
 
   /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * This will return false until at least one input value has been computed.
-   *
-   * @param positionTolerance The maximum allowable position error.
-   * @param velocityTolerance The maximum allowable velocity error.
-   * @param toleranceType     The type of tolerance specified.
-   */
-  bool AtSetpoint(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity(),
-      Tolerance toleranceType = Tolerance::kAbsolute) const;
-
-  /**
    * Returns true if the error is within the tolerance of the error.
    *
    * This will return false until at least one input value has been computed.
    */
   bool AtSetpoint() const;
-
-  /**
-   * Sets the minimum and maximum values expected from the input.
-   *
-   * @param minimumInput The minimum value expected from the input.
-   * @param maximumInput The maximum value expected from the input.
-   */
-  void SetInputRange(double minimumInput, double maximumInput);
 
   /**
    * Enables continuous input.
@@ -163,32 +141,23 @@ class PIDController : public frc::SendableBase {
   void DisableContinuousInput();
 
   /**
-   * Sets the minimum and maximum values to write.
+   * Sets the minimum and maximum values for the integrator.
    *
-   * @param minimumOutput the minimum value to write to the output
-   * @param maximumOutput the maximum value to write to the output
+   * When the cap is reached, the integrator value is added to the controller
+   * output rather than the integrator value times the integral gain.
+   *
+   * @param minimumIntegral The minimum value of the integrator.
+   * @param maximumIntegral The maximum value of the integrator.
    */
-  void SetOutputRange(double minimumOutput, double maximumOutput);
+  void SetIntegratorRange(double minimumIntegral, double maximumIntegral);
 
   /**
-   * Sets the absolute error which is considered tolerable for use with
-   * AtSetpoint().
+   * Sets the error which is considered tolerable for use with AtSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
    * @param velociytTolerance Velocity error which is tolerable.
    */
-  void SetAbsoluteTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity());
-
-  /**
-   * Sets the percent error which is considered tolerable for use with
-   * AtSetpoint().
-   *
-   * @param positionTolerance Position error which is tolerable.
-   * @param velociytTolerance Velocity error which is tolerable.
-   */
-  void SetPercentTolerance(
+  void SetTolerance(
       double positionTolerance,
       double velocityTolerance = std::numeric_limits<double>::infinity());
 
@@ -247,11 +216,9 @@ class PIDController : public frc::SendableBase {
   // The period (in seconds) of the control loop running this controller
   units::second_t m_period;
 
-  // |maximum output|
-  double m_maximumOutput = 1.0;
+  double m_maximumIntegral = 1.0;
 
-  // |minimum output|
-  double m_minimumOutput = -1.0;
+  double m_minimumIntegral = -1.0;
 
   // Maximum input - limit setpoint to this
   double m_maximumInput = 0;
@@ -276,13 +243,19 @@ class PIDController : public frc::SendableBase {
   // The sum of the errors for use in the integral calc
   double m_totalError = 0;
 
-  Tolerance m_toleranceType = Tolerance::kAbsolute;
-
   // The error that is considered at setpoint.
   double m_positionTolerance = 0.05;
   double m_velocityTolerance = std::numeric_limits<double>::infinity();
 
   double m_setpoint = 0;
+
+  /**
+   * Sets the minimum and maximum values expected from the input.
+   *
+   * @param minimumInput The minimum value expected from the input.
+   * @param maximumInput The maximum value expected from the input.
+   */
+  void SetInputRange(double minimumInput, double maximumInput);
 };
 
 }  // namespace frc2

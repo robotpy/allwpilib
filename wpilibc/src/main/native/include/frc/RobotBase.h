@@ -7,8 +7,12 @@
 
 #pragma once
 
+#include <chrono>
 #include <thread>
 
+#include <hal/Main.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/Base.h"
@@ -19,14 +23,71 @@ class DriverStation;
 
 int RunHALInitialization();
 
+namespace impl {
+
+template <class Robot>
+void RunRobot(wpi::mutex& m, Robot** robot) {
+  static Robot theRobot;
+  {
+    std::scoped_lock lock{m};
+    *robot = &theRobot;
+  }
+  theRobot.StartCompetition();
+}
+
+}  // namespace impl
+
 template <class Robot>
 int StartRobot() {
   int halInit = RunHALInitialization();
   if (halInit != 0) {
     return halInit;
   }
-  static Robot robot;
-  robot.StartCompetition();
+
+  static wpi::mutex m;
+  static wpi::condition_variable cv;
+  static Robot* robot = nullptr;
+  static bool exited = false;
+
+  if (HAL_HasMain()) {
+    std::thread thr([] {
+      try {
+        impl::RunRobot<Robot>(m, &robot);
+      } catch (...) {
+        HAL_ExitMain();
+        {
+          std::scoped_lock lock{m};
+          robot = nullptr;
+          exited = true;
+        }
+        cv.notify_all();
+        throw;
+      }
+
+      HAL_ExitMain();
+      {
+        std::scoped_lock lock{m};
+        robot = nullptr;
+        exited = true;
+      }
+      cv.notify_all();
+    });
+
+    HAL_RunMain();
+
+    // signal loop to exit
+    if (robot) robot->EndCompetition();
+
+    // prefer to join, but detach to exit if it doesn't exit in a timely manner
+    using namespace std::chrono_literals;
+    std::unique_lock lock{m};
+    if (cv.wait_for(lock, 1s, [] { return exited; }))
+      thr.join();
+    else
+      thr.detach();
+  } else {
+    impl::RunRobot<Robot>(m, &robot);
+  }
 
   return 0;
 }
@@ -102,6 +163,8 @@ class RobotBase {
   static std::thread::id GetThreadId();
 
   virtual void StartCompetition() = 0;
+
+  virtual void EndCompetition() = 0;
 
   static constexpr bool IsReal() {
 #ifdef __FRC_ROBORIO__

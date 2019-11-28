@@ -7,10 +7,26 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
+import java.io.IOException;
+import java.util.Objects;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
 /**
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
  */
+@JsonSerialize(using = Rotation2d.RotationSerializer.class)
+@JsonDeserialize(using = Rotation2d.RotationDeserializer.class)
 public class Rotation2d {
   private final double m_value;
   private final double m_cos;
@@ -106,6 +122,16 @@ public class Rotation2d {
   }
 
   /**
+   * Multiplies the current rotation by a scalar.
+   *
+   * @param scalar The scalar.
+   * @return The new scaled Rotation2d.
+   */
+  public Rotation2d times(double scalar) {
+    return new Rotation2d(m_value * scalar);
+  }
+
+  /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
    * <p>The matrix multiplication is as follows:
@@ -118,8 +144,8 @@ public class Rotation2d {
    */
   public Rotation2d rotateBy(Rotation2d other) {
     return new Rotation2d(
-            m_cos * other.m_cos - m_sin * other.m_sin,
-            m_cos * other.m_sin + m_sin * other.m_cos
+        m_cos * other.m_cos - m_sin * other.m_sin,
+        m_cos * other.m_sin + m_sin * other.m_cos
     );
   }
 
@@ -166,5 +192,60 @@ public class Rotation2d {
    */
   public double getTan() {
     return m_sin / m_cos;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("Rotation2d(Rads: %.2f, Deg: %.2f)", m_value, Math.toDegrees(m_value));
+  }
+
+  /**
+   * Checks equality between this Rotation2d and another object.
+   *
+   * @param obj The other object.
+   * @return Whether the two objects are equal or not.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Rotation2d) {
+      return Math.abs(((Rotation2d) obj).m_value - m_value) < 1E-9;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_value);
+  }
+
+  static class RotationSerializer extends StdSerializer<Rotation2d> {
+    RotationSerializer() {
+      super(Rotation2d.class);
+    }
+
+    @Override
+    public void serialize(
+            Rotation2d value, JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonProcessingException {
+
+      jgen.writeStartObject();
+      jgen.writeNumberField("radians", value.m_value);
+      jgen.writeEndObject();
+    }
+  }
+
+  static class RotationDeserializer extends StdDeserializer<Rotation2d> {
+    RotationDeserializer() {
+      super(Rotation2d.class);
+    }
+
+    @Override
+    public Rotation2d deserialize(JsonParser jp, DeserializationContext ctxt)
+            throws IOException, JsonProcessingException {
+      JsonNode node = jp.getCodec().readTree(jp);
+      double radians = node.get("radians").numberValue().doubleValue();
+
+      return new Rotation2d(radians);
+    }
   }
 }

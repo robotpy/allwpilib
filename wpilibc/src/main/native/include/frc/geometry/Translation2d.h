@@ -11,6 +11,10 @@
 
 #include "Rotation2d.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 namespace frc {
 
 /**
@@ -180,6 +184,22 @@ class Translation2d {
    */
   Translation2d operator/(double scalar) const;
 
+  /**
+   * Checks equality between this Translation2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Translation2d& other) const;
+
+  /**
+   * Checks inequality between this Translation2d and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are not equal.
+   */
+  bool operator!=(const Translation2d& other) const;
+
   /*
    * Divides the current translation by a scalar.
    *
@@ -195,4 +215,9 @@ class Translation2d {
   units::meter_t m_x = 0_m;
   units::meter_t m_y = 0_m;
 };
+
+void to_json(wpi::json& json, const Translation2d& state);
+
+void from_json(const wpi::json& json, Translation2d& state);
+
 }  // namespace frc

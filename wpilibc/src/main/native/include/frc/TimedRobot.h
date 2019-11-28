@@ -35,6 +35,11 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   void StartCompetition() override;
 
   /**
+   * Ends the main loop in StartCompetition().
+   */
+  void EndCompetition() override;
+
+  /**
    * Get the time period between calls to Periodic() functions.
    */
   units::second_t GetPeriod() const;
@@ -56,14 +61,14 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
 
   ~TimedRobot() override;
 
-  TimedRobot(TimedRobot&& rhs);
-  TimedRobot& operator=(TimedRobot&& rhs);
+  TimedRobot(TimedRobot&&) = default;
+  TimedRobot& operator=(TimedRobot&&) = default;
 
  private:
-  HAL_NotifierHandle m_notifier{0};
+  hal::Handle<HAL_NotifierHandle> m_notifier;
 
   // The absolute expiration time
-  double m_expirationTime = 0;
+  units::second_t m_expirationTime{0};
 
   /**
    * Update the HAL alarm time.

@@ -55,6 +55,8 @@ public final class RuntimeDetector {
         filePath = "/linux/athena/";
       } else if (isRaspbian()) {
         filePath = "/linux/raspbian/";
+      } else if (isAarch64Bionic()) {
+        filePath = "/linux/aarch64bionic/";
       } else {
         filePath = "/linux/nativearm/";
       }
@@ -121,6 +123,30 @@ public final class RuntimeDetector {
     try (BufferedReader reader = Files.newBufferedReader(Paths.get("/etc/os-release"))) {
       String value = reader.readLine();
       return value.contains("Raspbian");
+    } catch (IOException ex) {
+      return false;
+    }
+  }
+
+  /** check if os is bionic aarch64.
+   *
+   * @return if os is bionic aarch64
+   */
+  public static boolean isAarch64Bionic() {
+    if (!System.getProperty("os.arch").equals("aarch64")) {
+      return false;
+    }
+    try (BufferedReader reader = Files.newBufferedReader(Paths.get("/etc/os-release"))) {
+      String value = reader.readLine();
+      String version = "";
+      while (value != null) {
+        if (value.contains("VERSION=")) {
+          version = value;
+          break;
+        }
+        value = reader.readLine();
+      }
+      return version.contains("Bionic");
     } catch (IOException ex) {
       return false;
     }

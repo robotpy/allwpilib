@@ -10,19 +10,20 @@
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc2;
 
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
-    : frc::SendableBase(false), m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
+    : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
-  SetName("PIDController", instances);
+  frc::SendableRegistry::GetInstance().Add(this, "PIDController", instances);
 }
 
 void PIDController::SetP(double Kp) { m_Kp = Kp; }
@@ -51,31 +52,9 @@ void PIDController::SetSetpoint(double setpoint) {
 
 double PIDController::GetSetpoint() const { return m_setpoint; }
 
-bool PIDController::AtSetpoint(double positionTolerance,
-                               double velocityTolerance,
-                               Tolerance toleranceType) const {
-  if (m_toleranceType == Tolerance::kPercent) {
-    return std::abs(m_positionError) < positionTolerance / 100 * m_inputRange &&
-           std::abs(m_velocityError) < velocityTolerance / 100 * m_inputRange;
-  } else {
-    return std::abs(m_positionError) < positionTolerance &&
-           std::abs(m_velocityError) < velocityTolerance;
-  }
-}
-
 bool PIDController::AtSetpoint() const {
-  return AtSetpoint(m_positionTolerance, m_velocityTolerance);
-}
-
-void PIDController::SetInputRange(double minimumInput, double maximumInput) {
-  m_minimumInput = minimumInput;
-  m_maximumInput = maximumInput;
-  m_inputRange = maximumInput - minimumInput;
-
-  // Clamp setpoint to new input range
-  if (m_maximumInput > m_minimumInput) {
-    m_setpoint = std::clamp(m_setpoint, m_minimumInput, m_maximumInput);
-  }
+  return std::abs(m_positionError) < m_positionTolerance &&
+         std::abs(m_velocityError) < m_velocityTolerance;
 }
 
 void PIDController::EnableContinuousInput(double minimumInput,
@@ -86,21 +65,14 @@ void PIDController::EnableContinuousInput(double minimumInput,
 
 void PIDController::DisableContinuousInput() { m_continuous = false; }
 
-void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
-  m_minimumOutput = minimumOutput;
-  m_maximumOutput = maximumOutput;
+void PIDController::SetIntegratorRange(double minimumIntegral,
+                                       double maximumIntegral) {
+  m_minimumIntegral = minimumIntegral;
+  m_maximumIntegral = maximumIntegral;
 }
 
-void PIDController::SetAbsoluteTolerance(double positionTolerance,
-                                         double velocityTolerance) {
-  m_toleranceType = Tolerance::kAbsolute;
-  m_positionTolerance = positionTolerance;
-  m_velocityTolerance = velocityTolerance;
-}
-
-void PIDController::SetPercentTolerance(double positionTolerance,
-                                        double velocityTolerance) {
-  m_toleranceType = Tolerance::kPercent;
+void PIDController::SetTolerance(double positionTolerance,
+                                 double velocityTolerance) {
   m_positionTolerance = positionTolerance;
   m_velocityTolerance = velocityTolerance;
 }
@@ -119,12 +91,10 @@ double PIDController::Calculate(double measurement) {
   if (m_Ki != 0) {
     m_totalError =
         std::clamp(m_totalError + m_positionError * m_period.to<double>(),
-                   m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
+                   m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
   }
 
-  return std::clamp(
-      m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError,
-      m_minimumOutput, m_maximumOutput);
+  return m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError;
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {
@@ -163,4 +133,15 @@ double PIDController::GetContinuousError(double error) const {
   }
 
   return error;
+}
+
+void PIDController::SetInputRange(double minimumInput, double maximumInput) {
+  m_minimumInput = minimumInput;
+  m_maximumInput = maximumInput;
+  m_inputRange = maximumInput - minimumInput;
+
+  // Clamp setpoint to new input range
+  if (m_maximumInput > m_minimumInput) {
+    m_setpoint = std::clamp(m_setpoint, m_minimumInput, m_maximumInput);
+  }
 }

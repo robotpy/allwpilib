@@ -1,6 +1,7 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
 ext {
+    noWpiutil = true
     baseId = 'wpiutil'
     groupId = 'edu.wpi.first.wpiutil'
 
@@ -8,7 +9,7 @@ ext {
     devMain = 'edu.wpi.first.wpiutil.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
-    extraSetup = {
+    splitSetup = {
         it.tasks.withType(CppCompile) {
             dependsOn generateTask
         }
@@ -152,7 +153,7 @@ file("$projectDir/examples").list(new FilenameFilter() {
     examplesMap.put(it, [])
 }
 
-apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
     wpiutil {
@@ -171,6 +172,9 @@ cppHeadersZip {
     from('src/main/native/libuv/include') {
         into '/'
     }
+    from('src/main/native/eigeninclude') {
+        into '/'
+    }
 }
 
 model {
@@ -178,7 +182,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src', 'src/main/native/eigeninclude'
                 }
             }
         }
@@ -238,7 +242,10 @@ model {
 }
 
 dependencies {
-    compile "org.ejml:ejml-simple:0.38"
+    api "org.ejml:ejml-simple:0.38"
+    api "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
+    api "com.fasterxml.jackson.core:jackson-core:2.10.0"
+    api "com.fasterxml.jackson.core:jackson-databind:2.10.0"
 }
 
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")
@@ -253,6 +260,7 @@ task generateNumbers() {
     group = "WPILib"
 
     inputs.file wpilibNumberFileInput
+    outputs.dir wpilibNumberFileOutputDir
 
     doLast {
         if(wpilibNumberFileOutputDir.exists()) {
@@ -272,6 +280,7 @@ task generateNat() {
     description = "Generates Nat.java"
     group = "WPILib"
     inputs.files([natFileInput, natGetterInput])
+    outputs.file wpilibNatFileOutput
     dependsOn generateNumbers
 
     doLast {
@@ -280,10 +289,16 @@ task generateNat() {
         }
 
         def template = natFileInput.text + "\n"
+
+        def importsString = "";
+
         for(i in 0..maxNum) {
+            importsString += "import edu.wpi.first.wpiutil.math.numbers.N${i};\n"
             template += natGetterInput.text.replace('${num}', i.toString()) + "\n"
         }
         template += "}\n" // Close the class body
+
+        template = template.replace('{{REPLACEWITHIMPORTS}}', importsString)
 
         wpilibNatFileOutput.write(template)
     }
