@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 public class Robot extends TimedRobot {
+  // Calculate period for the Trapezoidal Profile and PIDController
   private static double kDt = 0.02;
 
   private final Joystick m_joystick = new Joystick(1);
@@ -34,6 +35,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if (m_joystick.getRawButtonPressed(2)) {
+      // Making the desired state(goal) of stationary 5 inches up.
       m_goal = new TrapezoidProfile.State(5, 0);
     } else if (m_joystick.getRawButtonPressed(3)) {
       m_goal = new TrapezoidProfile.State(0, 0);

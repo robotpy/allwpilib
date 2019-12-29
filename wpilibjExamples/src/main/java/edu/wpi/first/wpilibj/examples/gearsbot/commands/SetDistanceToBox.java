@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
 
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kPDrive;
+
 
 /**
  * Drive until the robot is the given distance away from the box. Uses a local
@@ -28,7 +30,7 @@ public class SetDistanceToBox extends PIDCommand {
    * @param distance The distance away from the box to drive to
    */
   public SetDistanceToBox(double distance, DriveTrain drivetrain) {
-    super(new PIDController(-2, 0, 0),
+    super(new PIDController(kPDrive, 0, 0),
         drivetrain::getDistanceToObstacle, distance,
         d -> drivetrain.drive(d, d));
 
