@@ -53,6 +53,7 @@ class Encoder : public QuadratureEncoder {
    *                         value will either exactly match the spec'd count or
    *                         be double (2x) the spec'd count.
    */
+  WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(int aChannel, int bChannel, bool reverseDirection = false,
           QuadratureEncoder::EncodingType encodingType = k4X) : QuadratureEncoder(aChannel, bChannel, reverseDirection, encodingType){}
 
@@ -79,6 +80,7 @@ class Encoder : public QuadratureEncoder {
    *                         value will either exactly match the spec'd count or
    *                         be double (2x) the spec'd count.
    */
+  WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(DigitalSource* aSource, DigitalSource* bSource,
           bool reverseDirection = false, QuadratureEncoder::EncodingType encodingType = k4X) : QuadratureEncoder(aSource, bSource, reverseDirection, encodingType){}
 
@@ -105,6 +107,7 @@ class Encoder : public QuadratureEncoder {
    *                         value will either exactly match the spec'd count or
    *                         be double (2x) the spec'd count.
    */
+  WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(DigitalSource& aSource, DigitalSource& bSource,
           bool reverseDirection = false, QuadratureEncoder::EncodingType encodingType = k4X) : QuadratureEncoder(aSource, bSource, reverseDirection, encodingType){}
 
