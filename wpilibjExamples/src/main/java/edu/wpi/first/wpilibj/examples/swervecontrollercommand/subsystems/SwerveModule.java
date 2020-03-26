@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems;
 
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -21,8 +21,8 @@ public class SwerveModule {
   private final Spark m_driveMotor;
   private final Spark m_turningMotor;
 
-  private final Encoder m_driveEncoder;
-  private final Encoder m_turningEncoder;
+  private final QuadratureEncoder m_driveEncoder;
+  private final QuadratureEncoder m_turningEncoder;
 
   private final PIDController m_drivePIDController =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
@@ -51,9 +51,9 @@ public class SwerveModule {
     m_driveMotor = new Spark(driveMotorChannel);
     m_turningMotor = new Spark(turningMotorChannel);
 
-    this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
+    this.m_driveEncoder = new QuadratureEncoder(driveEncoderPorts[0], driveEncoderPorts[1]);
 
-    this.m_turningEncoder = new Encoder(turningEncoderPorts[0], turningEncoderPorts[1]);
+    this.m_turningEncoder = new QuadratureEncoder(turningEncoderPorts[0], turningEncoderPorts[1]);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder

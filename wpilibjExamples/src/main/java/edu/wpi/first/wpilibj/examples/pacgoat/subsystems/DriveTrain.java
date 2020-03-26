@@ -9,8 +9,8 @@ package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Victor;
@@ -35,8 +35,10 @@ public class DriveTrain extends Subsystem {
   private final SpeedControllerGroup m_rightCIMs = new SpeedControllerGroup(
       m_frontRightCIM, m_rearRightCIM);
   private final DifferentialDrive m_drive;
-  private final Encoder m_rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
-  private final Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
+  private final QuadratureEncoder m_rightEncoder =
+          new QuadratureEncoder(1, 2, true, EncodingType.k4X);
+  private final QuadratureEncoder m_leftEncoder =
+          new QuadratureEncoder(3, 4, false, EncodingType.k4X);
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
   /**
@@ -68,8 +70,8 @@ public class DriveTrain extends Subsystem {
           (4.0/* in */ * Math.PI) / (360.0 * 12.0/* in/ft */));
     }
 
-    addChild("Right Encoder", m_rightEncoder);
-    addChild("Left Encoder", m_leftEncoder);
+    addChild("Right QuadratureEncoder", m_rightEncoder);
+    addChild("Left QuadratureEncoder", m_leftEncoder);
 
     // Configure gyro
     if (Robot.isReal()) {
@@ -117,7 +119,7 @@ public class DriveTrain extends Subsystem {
    * The encoder getting the distance and speed of left side of the
    * drivetrain.
    */
-  public Encoder getLeftEncoder() {
+  public QuadratureEncoder getLeftEncoder() {
     return m_leftEncoder;
   }
 
@@ -125,7 +127,7 @@ public class DriveTrain extends Subsystem {
    * The encoder getting the distance and speed of right side of the
    * drivetrain.
    */
-  public Encoder getRightEncoder() {
+  public QuadratureEncoder getRightEncoder() {
     return m_rightEncoder;
   }
 

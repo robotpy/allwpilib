@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj.examples.armbot.subsystems;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants;
  */
 public class ArmSubsystem extends ProfiledPIDSubsystem {
   private final PWMVictorSPX m_motor = new PWMVictorSPX(ArmConstants.kMotorPort);
-  private final Encoder m_encoder =
-      new Encoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
+  private final QuadratureEncoder m_encoder =
+      new QuadratureEncoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
   private final ArmFeedforward m_feedforward =
       new ArmFeedforward(ArmConstants.kSVolts, ArmConstants.kCosVolts,
                          ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);

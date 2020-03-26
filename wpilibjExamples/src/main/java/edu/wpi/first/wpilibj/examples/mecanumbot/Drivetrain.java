@@ -8,8 +8,8 @@
 package edu.wpi.first.wpilibj.examples.mecanumbot;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -33,10 +33,10 @@ public class Drivetrain {
   private final SpeedController m_backLeftMotor = new PWMVictorSPX(3);
   private final SpeedController m_backRightMotor = new PWMVictorSPX(4);
 
-  private final Encoder m_frontLeftEncoder = new Encoder(0, 1);
-  private final Encoder m_frontRightEncoder = new Encoder(2, 3);
-  private final Encoder m_backLeftEncoder = new Encoder(4, 5);
-  private final Encoder m_backRightEncoder = new Encoder(6, 7);
+  private final QuadratureEncoder m_frontLeftEncoder = new QuadratureEncoder(0, 1);
+  private final QuadratureEncoder m_frontRightEncoder = new QuadratureEncoder(2, 3);
+  private final QuadratureEncoder m_backLeftEncoder = new QuadratureEncoder(4, 5);
+  private final QuadratureEncoder m_backRightEncoder = new QuadratureEncoder(6, 7);
 
   private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
   private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
