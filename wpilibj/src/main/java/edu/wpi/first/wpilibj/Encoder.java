@@ -23,7 +23,7 @@ package edu.wpi.first.wpilibj;
  * @deprecated use {@link QuadratureEncoder}
  */
 @Deprecated(forRemoval = true)
-public class Encoder extends QuadratureEncoder{
+public class Encoder extends QuadratureEncoder {
   /**
    * Encoder constructor. Construct a Encoder given a and b channels.
    *
@@ -87,7 +87,7 @@ public class Encoder extends QuadratureEncoder{
    */
   public Encoder(final int channelA, final int channelB, final int indexChannel,
                  boolean reverseDirection) {
-    super(channelA, channelB, reverseDirection);
+    super(channelA, channelB, indexChannel, reverseDirection);
   }
 
   /**
@@ -173,7 +173,7 @@ public class Encoder extends QuadratureEncoder{
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, DigitalSource indexSource,
                  boolean reverseDirection) {
-    super(sourceA, sourceB, reverseDirection);
+    super(sourceA, sourceB, indexSource, reverseDirection);
   }
 
   /**
