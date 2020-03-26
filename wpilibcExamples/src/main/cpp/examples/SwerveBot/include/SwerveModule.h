@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -33,8 +33,8 @@ class SwerveModule {
   frc::PWMVictorSPX m_driveMotor;
   frc::PWMVictorSPX m_turningMotor;
 
-  frc::Encoder m_driveEncoder{0, 1};
-  frc::Encoder m_turningEncoder{2, 3};
+  frc::QuadratureEncoder m_driveEncoder{0, 1};
+  frc::QuadratureEncoder m_turningEncoder{2, 3};
 
   frc2::PIDController m_drivePIDController{1.0, 0, 0};
   frc::ProfiledPIDController<units::radians> m_turningPIDController{

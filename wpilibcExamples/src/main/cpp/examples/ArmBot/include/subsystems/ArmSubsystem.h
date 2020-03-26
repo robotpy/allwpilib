@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/controller/ArmFeedforward.h>
 #include <frc2/command/ProfiledPIDSubsystem.h>
 #include <units/units.h>
@@ -28,6 +28,6 @@ class ArmSubsystem : public frc2::ProfiledPIDSubsystem<units::radians> {
 
  private:
   frc::PWMVictorSPX m_motor;
-  frc::Encoder m_encoder;
+  frc::QuadratureEncoder m_encoder;
   frc::ArmFeedforward m_feedforward;
 };
