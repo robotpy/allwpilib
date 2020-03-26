@@ -7,6 +7,7 @@
 
 #pragma once
 #include <wpi/deprecated.h>
+#include "QuadratureEncoder.h"
 
 namespace frc {
 
@@ -28,7 +29,7 @@ namespace frc {
  */
 
 class Encoder : public QuadratureEncoder {
-
+  public:
 
   /**
    * Encoder constructor.
@@ -54,8 +55,8 @@ class Encoder : public QuadratureEncoder {
    *                         be double (2x) the spec'd count.
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
-  Encoder(int aChannel, int bChannel, bool reverseDirection = false,
-          QuadratureEncoder::EncodingType encodingType = k4X) : QuadratureEncoder(aChannel, bChannel, reverseDirection, encodingType){}
+  Encoder(int aChannel, int bChannel, bool reverseDirection = false, 
+        EncodingType encodingType = EncodingType::k4X);
 
   /**
    * Encoder constructor.
@@ -82,7 +83,7 @@ class Encoder : public QuadratureEncoder {
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(DigitalSource* aSource, DigitalSource* bSource,
-          bool reverseDirection = false, QuadratureEncoder::EncodingType encodingType = k4X) : QuadratureEncoder(aSource, bSource, reverseDirection, encodingType){}
+          bool reverseDirection = false, EncodingType encodingType = EncodingType::k4X);
 
   /**
    * Encoder constructor.
@@ -108,12 +109,11 @@ class Encoder : public QuadratureEncoder {
    *                         be double (2x) the spec'd count.
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
-  Encoder(DigitalSource& aSource, DigitalSource& bSource,
-          bool reverseDirection = false, QuadratureEncoder::EncodingType encodingType = k4X) : QuadratureEncoder(aSource, bSource, reverseDirection, encodingType){}
+  Encoder(DigitalSource& aSource, DigitalSource& bSource, bool reverseDirection = false,
+          EncodingType encodingType = EncodingType::k4X);
 
-  Encoder(std::shared_ptr<DigitalSource> aSource,
-          std::shared_ptr<DigitalSource> bSource, bool reverseDirection = false,
-          QuadratureEncoder::EncodingType encodingType = k4X) : QuadratureEncoder(aSource, bSource, reverseDirection, encodingType){}
+  Encoder(std::shared_ptr<DigitalSource> aSource, std::shared_ptr<DigitalSource> bSource,
+          bool reverseDirection = false, EncodingType encodingType = EncodingType::k4X);
 
 
   

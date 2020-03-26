@@ -20,7 +20,7 @@
 
 namespace frc {
 
-class Encoder;
+class QuadratureEncoder;
 class Counter;
 
 /**
@@ -52,7 +52,7 @@ class DigitalGlitchFilter : public ErrorBase,
    *
    * @param input The Encoder to add.
    */
-  void Add(Encoder* input);
+  void Add(QuadratureEncoder* input);
 
   /**
    * Assigns the Counter to this glitch filter.
@@ -79,7 +79,7 @@ class DigitalGlitchFilter : public ErrorBase,
    *
    * @param input The Encoder to remove.
    */
-  void Remove(Encoder* input);
+  void Remove(QuadratureEncoder* input);
 
   /**
    * Removes a counter from this filter.

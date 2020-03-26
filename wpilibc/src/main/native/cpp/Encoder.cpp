@@ -11,16 +11,20 @@
 using namespace frc;
 
 Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
-                 QuadratureEncoder::EncodingType encodingType) : QuadratureEncoder(aChannel, bChannel, reverseDirection, encodingType){}
+                 EncodingType encodingType) :
+                 QuadratureEncoder(aChannel, bChannel, reverseDirection, encodingType){}
 
 Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
-                 bool reverseDirection, QuadratureEncoder::EncodingType encodingType) : QuadratureEncoder(aSource, bSource, reverseDirection, encodingType) {}
+                 bool reverseDirection, EncodingType encodingType) :
+                 QuadratureEncoder(aSource, bSource, reverseDirection, encodingType) {}
 
 Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
-                 bool reverseDirection, QuadratureEncoder::EncodingType encodingType): QuadratureEncoder(aSource, bSource, reverseDirection, encodingType) {}
+                 bool reverseDirection, EncodingType encodingType):
+                 QuadratureEncoder(aSource, bSource, reverseDirection, encodingType) {}
 
 
 Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
                  std::shared_ptr<DigitalSource> bSource, bool reverseDirection,
-                 QuadratureEncoder::EncodingType encodingType) : QuadratureEncoder(aSource, bSource, reverseDirection, encodingType) {}
+                 EncodingType encodingType) :
+                 QuadratureEncoder(aSource, bSource, reverseDirection, encodingType) {}
 

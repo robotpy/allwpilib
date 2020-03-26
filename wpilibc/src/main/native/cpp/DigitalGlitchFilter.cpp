@@ -16,7 +16,7 @@
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/Counter.h"
-#include "frc/Encoder.h"
+#include "frc/QuadratureEncoder.h"
 #include "frc/SensorUtil.h"
 #include "frc/Utility.h"
 #include "frc/WPIErrors.h"
@@ -90,7 +90,7 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requestedIndex) {
   }
 }
 
-void DigitalGlitchFilter::Add(Encoder* input) {
+void DigitalGlitchFilter::Add(QuadratureEncoder* input) {
   Add(input->m_aSource.get());
   if (StatusIsFatal()) {
     return;
@@ -108,7 +108,7 @@ void DigitalGlitchFilter::Add(Counter* input) {
 
 void DigitalGlitchFilter::Remove(DigitalSource* input) { DoAdd(input, 0); }
 
-void DigitalGlitchFilter::Remove(Encoder* input) {
+void DigitalGlitchFilter::Remove(QuadratureEncoder* input) {
   Remove(input->m_aSource.get());
   if (StatusIsFatal()) {
     return;
