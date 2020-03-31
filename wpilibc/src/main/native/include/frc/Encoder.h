@@ -13,7 +13,7 @@ namespace frc {
 
 /**
  * Class to read quad encoders.
- * Deprecated : use QuadratureEncoder instead.
+ * @deprecated : use QuadratureEncoder instead.
  *
  * Quadrature encoders are devices that count shaft rotation and can sense
  * direction. The output of the QuadEncoder class is an integer that can count
