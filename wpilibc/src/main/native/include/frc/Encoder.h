@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+#include <memory.h>
 #include <wpi/deprecated.h>
 #include "QuadratureEncoder.h"
 
