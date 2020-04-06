@@ -12,6 +12,7 @@
 #include <memory>
 #include <utility>
 
+#include <units/units.h>
 #include <wpi/ArrayRef.h>
 
 #include "frc2/command/Command.h"
@@ -347,6 +348,15 @@ class Trigger {
   Trigger operator!() {
     return Trigger([*this] { return !m_isActive(); });
   }
+
+  /**
+   * Creates a new debounced trigger from this trigger - it will become active
+   * when this trigger has been active for longer than the specified period.
+   *
+   * @param debounceTime the debounce period
+   * @return the debounced trigger
+   */
+  Trigger Debounce(units::second_t debounceTime);
 
  private:
   std::function<bool()> m_isActive;

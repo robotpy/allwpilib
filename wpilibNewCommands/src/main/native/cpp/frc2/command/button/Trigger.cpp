@@ -7,6 +7,8 @@
 
 #include "frc2/command/button/Trigger.h"
 
+#include <frc/Debouncer.h>
+
 #include "frc2/command/InstantCommand.h"
 
 using namespace frc2;
@@ -139,4 +141,10 @@ Trigger Trigger::CancelWhenActive(Command* command) {
         pressedLast = pressed;
       });
   return *this;
+}
+
+Trigger Trigger::Debounce(units::second_t debounceTime) {
+  return Trigger([debouncer = frc::Debouncer(debounceTime), *this]() mutable {
+    return debouncer.Calculate(m_isActive());
+  });
 }
