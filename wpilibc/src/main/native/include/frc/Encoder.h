@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -112,7 +112,8 @@ class Encoder : public QuadratureEncoder {
   WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(DigitalSource& aSource, DigitalSource& bSource, bool reverseDirection = false,
           EncodingType encodingType = EncodingType::k4X);
-
+          
+  WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(std::shared_ptr<DigitalSource> aSource, std::shared_ptr<DigitalSource> bSource,
           bool reverseDirection = false, EncodingType encodingType = EncodingType::k4X);
 
