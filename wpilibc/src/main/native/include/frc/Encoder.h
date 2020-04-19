@@ -7,7 +7,9 @@
 
 #pragma once
 #include <memory>
+
 #include <wpi/deprecated.h>
+
 #include "QuadratureEncoder.h"
 
 namespace frc {
@@ -31,7 +33,6 @@ namespace frc {
 
 class Encoder : public QuadratureEncoder {
   public:
-
   /**
    * Encoder constructor.
    *
@@ -56,8 +57,8 @@ class Encoder : public QuadratureEncoder {
    *                         be double (2x) the spec'd count.
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
-  Encoder(int aChannel, int bChannel, bool reverseDirection = false, 
-        EncodingType encodingType = EncodingType::k4X);
+  Encoder(int aChannel, int bChannel, bool reverseDirection = false,
+         EncodingType encodingType = EncodingType::k4X);
 
   /**
    * Encoder constructor.
@@ -84,8 +85,8 @@ class Encoder : public QuadratureEncoder {
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(DigitalSource* aSource, DigitalSource* bSource,
-          bool reverseDirection = false, EncodingType encodingType = EncodingType::k4X);
-
+          bool reverseDirection = false,
+          EncodingType encodingType = EncodingType::k4X);
   /**
    * Encoder constructor.
    *
@@ -110,14 +111,13 @@ class Encoder : public QuadratureEncoder {
    *                         be double (2x) the spec'd count.
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
-  Encoder(DigitalSource& aSource, DigitalSource& bSource, bool reverseDirection = false,
-          EncodingType encodingType = EncodingType::k4X);
+  Encoder(DigitalSource& aSource, DigitalSource& bSource,
+          bool reverseDirection = false,
+           EncodingType encodingType = EncodingType::k4X);
           
   WPI_DEPRECATED("use QuadratureEncoder instead")
-  Encoder(std::shared_ptr<DigitalSource> aSource, std::shared_ptr<DigitalSource> bSource,
-          bool reverseDirection = false, EncodingType encodingType = EncodingType::k4X);
-
-
-  
-
-} ;}
+  Encoder(std::shared_ptr<DigitalSource> aSource,
+          std::shared_ptr<DigitalSource> bSource, bool reverseDirection = false,
+          EncodingType encodingType = EncodingType::k4X);
+};
+}  // namespace frc

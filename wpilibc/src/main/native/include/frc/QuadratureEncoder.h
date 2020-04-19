@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -42,10 +42,10 @@ class DMASample;
  * to be zeroed before use.
  */
 class QuadratureEncoder : public ErrorBase,
-                public CounterBase,
-                public PIDSource,
-                public Sendable,
-                public SendableHelper<QuadratureEncoder> {
+                          public CounterBase,
+                          public PIDSource,
+                          public Sendable,
+                          public SendableHelper<QuadratureEncoder> {
   friend class DMA;
   friend class DMASample;
 
@@ -81,7 +81,7 @@ class QuadratureEncoder : public ErrorBase,
    *                         be double (2x) the spec'd count.
    */
   QuadratureEncoder(int aChannel, int bChannel, bool reverseDirection = false,
-          EncodingType encodingType = k4X);
+                    EncodingType encodingType = k4X);
 
   /**
    * QuadratureEncoder constructor.
@@ -107,7 +107,7 @@ class QuadratureEncoder : public ErrorBase,
    *                         be double (2x) the spec'd count.
    */
   QuadratureEncoder(DigitalSource* aSource, DigitalSource* bSource,
-          bool reverseDirection = false, EncodingType encodingType = k4X);
+                    bool reverseDirection = false, EncodingType encodingType = k4X);
 
   /**
    * QuadratureEncoder constructor.
@@ -133,11 +133,12 @@ class QuadratureEncoder : public ErrorBase,
    *                         be double (2x) the spec'd count.
    */
   QuadratureEncoder(DigitalSource& aSource, DigitalSource& bSource,
-          bool reverseDirection = false, EncodingType encodingType = k4X);
+                    bool reverseDirection = false, EncodingType encodingType = k4X);
 
-  QuadratureEncoder(std::shared_ptr<DigitalSource> aSource,
-          std::shared_ptr<DigitalSource> bSource, bool reverseDirection = false,
-          EncodingType encodingType = k4X);
+   QuadratureEncoder(std::shared_ptr<DigitalSource> aSource,
+                    std::shared_ptr<DigitalSource> bSource,
+                    bool reverseDirection = false,
+                    EncodingType encodingType = k4X);
 
   ~QuadratureEncoder() override;
 
@@ -148,11 +149,11 @@ class QuadratureEncoder : public ErrorBase,
   /**
    * Gets the current count.
    *
-   * Returns the current count on the QuadratureEncoder. This method compensates for the
-   * decoding type.
+   * Returns the current count on the QuadratureEncoder. This method compensates
+   * for the decoding type.
    *
-   * @return Current count from the QuadratureEncoder adjusted for the 1x, 2x, or 4x scale
-   *         factor.
+   * @return Current count from the QuadratureEncoder adjusted for the 1x, 2x,
+   * or 4x scale factor.
    */
   int Get() const override;
 
