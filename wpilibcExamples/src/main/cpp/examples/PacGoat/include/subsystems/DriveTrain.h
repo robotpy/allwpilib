@@ -73,7 +73,9 @@ class DriveTrain : public frc::Subsystem {
 
   frc::DifferentialDrive m_robotDrive{m_leftCIMs, m_rightCIMs};
 
-  frc::QuadratureEncoder m_rightEncoder{1, 2, true, frc::QuadratureEncoder::k4X};
-  frc::QuadratureEncoder m_leftEncoder{3, 4, false, frc::QuadratureEncoder::k4X};
+  frc::QuadratureEncoder m_rightEncoder{1, 2, true,
+                                        frc::QuadratureEncoder::k4X};
+  frc::QuadratureEncoder m_leftEncoder{3, 4, false,
+                                      frc::QuadratureEncoder::k4X};
   frc::AnalogGyro m_gyro{0};
 };

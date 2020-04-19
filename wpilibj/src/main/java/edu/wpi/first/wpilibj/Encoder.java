@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,7 +19,7 @@ package edu.wpi.first.wpilibj;
  *
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
- * 
+ *
  * @deprecated use {@link QuadratureEncoder}
  */
 @Deprecated(forRemoval = true)
@@ -70,7 +70,6 @@ public class Encoder extends QuadratureEncoder {
                  final EncodingType encodingType) {
 
     super(channelA, channelB, reverseDirection, encodingType);
-    
   }
 
   /**
