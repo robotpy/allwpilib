@@ -32,7 +32,7 @@ namespace frc {
  */
 
 class Encoder : public QuadratureEncoder {
-  public:
+ public:
   /**
    * Encoder constructor.
    *
@@ -58,7 +58,7 @@ class Encoder : public QuadratureEncoder {
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(int aChannel, int bChannel, bool reverseDirection = false,
-         EncodingType encodingType = EncodingType::k4X);
+          EncodingType encodingType = EncodingType::k4X);
 
   /**
    * Encoder constructor.
@@ -113,8 +113,8 @@ class Encoder : public QuadratureEncoder {
   WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(DigitalSource& aSource, DigitalSource& bSource,
           bool reverseDirection = false,
-           EncodingType encodingType = EncodingType::k4X);
-          
+          EncodingType encodingType = EncodingType::k4X);
+
   WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(std::shared_ptr<DigitalSource> aSource,
           std::shared_ptr<DigitalSource> bSource, bool reverseDirection = false,

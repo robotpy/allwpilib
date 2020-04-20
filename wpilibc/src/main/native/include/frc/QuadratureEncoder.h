@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -86,9 +86,10 @@ class QuadratureEncoder : public ErrorBase,
   /**
    * QuadratureEncoder constructor.
    *
-   * Construct a QuadratureEncoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The QuadratureEncoder class will not
-   * allocate the digital inputs and assume that they already are counted.
+   * Construct a QuadratureEncoder given a and b channels as digital inputs.
+   * This is used in the case where the digital inputs are shared. The
+   * QuadratureEncoder class will not allocate the digital inputs and assume
+   * that they already are counted.
    *
    * The counter will start counting immediately.
    *
@@ -107,14 +108,16 @@ class QuadratureEncoder : public ErrorBase,
    *                         be double (2x) the spec'd count.
    */
   QuadratureEncoder(DigitalSource* aSource, DigitalSource* bSource,
-                    bool reverseDirection = false, EncodingType encodingType = k4X);
+                    bool reverseDirection = false,
+                    EncodingType encodingType = k4X);
 
   /**
    * QuadratureEncoder constructor.
    *
-   * Construct a QuadratureEncoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The QuadratureEncoder class will not
-   * allocate the digital inputs and assume that they already are counted.
+   * Construct a QuadratureEncoder given a and b channels as digital inputs.
+   * This is used in the case where the digital inputs are shared. The
+   * QuadratureEncoder class will not allocate the digital inputs and assume
+   * that they already are counted.
    *
    * The counter will start counting immediately.
    *

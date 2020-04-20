@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -20,8 +20,8 @@
 using namespace frc;
 
 QuadratureEncoder::QuadratureEncoder(int aChannel, int bChannel,
-                 bool reverseDirection,
-                 EncodingType encodingType) {
+                                     bool reverseDirection,
+                                     EncodingType encodingType) {
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
@@ -29,7 +29,6 @@ QuadratureEncoder::QuadratureEncoder(int aChannel, int bChannel,
   registry.AddChild(this, m_aSource.get());
   registry.AddChild(this, m_bSource.get());
 }
-
 
 QuadratureEncoder::QuadratureEncoder(DigitalSource* aSource,
                                      DigitalSource* bSource,
@@ -42,8 +41,6 @@ QuadratureEncoder::QuadratureEncoder(DigitalSource* aSource,
   else
     InitEncoder(reverseDirection, encodingType);
 }
-
-
 
 QuadratureEncoder::QuadratureEncoder(DigitalSource& aSource,
                                      DigitalSource& bSource,
@@ -207,7 +204,6 @@ double QuadratureEncoder::PIDGet() {
       return 0.0;
   }
 }
-
 
 void QuadratureEncoder::SetIndexSource(int channel,
                                        QuadratureEncoder::IndexingType type) {
