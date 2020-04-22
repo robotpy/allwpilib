@@ -8,8 +8,8 @@
 #pragma once
 
 #include <frc/AnalogGyro.h>
-#include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -68,8 +68,8 @@ class Drivetrain {
   frc::SpeedControllerGroup m_leftGroup{m_leftMaster, m_leftFollower};
   frc::SpeedControllerGroup m_rightGroup{m_rightMaster, m_rightFollower};
 
-  frc::Encoder m_leftEncoder{0, 1};
-  frc::Encoder m_rightEncoder{2, 3};
+  frc::QuadratureEncoder m_leftEncoder{0, 1};
+  frc::QuadratureEncoder m_rightEncoder{2, 3};
 
   frc2::PIDController m_leftPIDController{1.0, 0.0, 0.0};
   frc2::PIDController m_rightPIDController{1.0, 0.0, 0.0};
