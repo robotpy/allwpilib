@@ -561,6 +561,7 @@
     ],
     "foldername": "digitalcommunication",
     "gradlebase": "java",
+    "commandversion": 1,
     "mainclass": "Main"
   },
   {
@@ -571,6 +572,7 @@
     ],
     "foldername": "i2ccommunication",
     "gradlebase": "java",
+    "commandversion": 1,
     "mainclass": "Main"
   }
 ]
