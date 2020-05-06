@@ -551,6 +551,7 @@
       "Digital"
     ],
     "foldername": "DigitalCommunication",
+    "commandversion": 1,
     "gradlebase": "cpp"
   }
 ]
