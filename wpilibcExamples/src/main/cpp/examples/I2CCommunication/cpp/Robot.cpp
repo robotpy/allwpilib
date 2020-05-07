@@ -18,7 +18,7 @@
  * controller from the robot code using the roboRIO's I2C port.
  */
 class Robot : public frc::TimedRobot {
- public:  
+ public:
   void RobotPeriodic() override {
     // Creates a string to hold current robot state information, including
     // alliance, enabled state, operation mode, and match time. The message
