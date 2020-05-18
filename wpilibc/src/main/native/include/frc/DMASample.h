@@ -50,7 +50,7 @@ class DMASample : public HAL_DMASample {
   }
 
   int32_t GetEncoderPeriodRaw(const QuadratureEncoder* QuadratureEncoder,
-                        int32_t* status) const {
+                              int32_t* status) const {
     return HAL_GetDMASampleEncoderPeriodRaw(this, QuadratureEncoder->m_encoder,
                                             status);
   }
