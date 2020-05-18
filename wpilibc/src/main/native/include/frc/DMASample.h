@@ -35,19 +35,24 @@ class DMASample : public HAL_DMASample {
     return units::second_t{static_cast<double>(GetTime()) * 1.0e-6};
   }
 
-  int32_t GetEncoderRaw(const QuadratureEncoder* QuadratureEncoder, int32_t* status) const {
-    return HAL_GetDMASampleEncoderRaw(this, QuadratureEncoder->m_encoder, status);
+  int32_t GetEncoderRaw(const QuadratureEncoder* QuadratureEncoder,
+                        int32_t* status) const {
+    return HAL_GetDMASampleEncoderRaw(this, QuadratureEncoder->m_encoder,
+                                      status);
   }
 
-  double GetEncoderDistance(const QuadratureEncoder* QuadratureEncoder, int32_t* status) const {
+  double GetEncoderDistance(const QuadratureEncoder* QuadratureEncoder,
+                            int32_t* status) const {
     double val = GetEncoderRaw(QuadratureEncoder, status);
     val *= QuadratureEncoder->DecodingScaleFactor();
     val *= QuadratureEncoder->GetDistancePerPulse();
     return val;
   }
 
-  int32_t GetEncoderPeriodRaw(const QuadratureEncoder* QuadratureEncoder, int32_t* status) const {
-    return HAL_GetDMASampleEncoderPeriodRaw(this, QuadratureEncoder->m_encoder, status);
+  int32_t GetEncoderPeriodRaw(const QuadratureEncoder* QuadratureEncoder,
+                        int32_t* status) const {
+    return HAL_GetDMASampleEncoderPeriodRaw(this, QuadratureEncoder->m_encoder,
+                                            status);
   }
 
   int32_t GetCounter(const Counter* counter, int32_t* status) const {
