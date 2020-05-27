@@ -81,7 +81,9 @@ frc::QuadratureEncoder& DriveSubsystem::GetFrontLeftEncoder() {
   return m_frontLeftEncoder;
 }
 
-frc::QuadratureEncoder& DriveSubsystem::GetRearLeftEncoder() { return m_rearLeftEncoder; }
+frc::QuadratureEncoder& DriveSubsystem::GetRearLeftEncoder() {
+  return m_rearLeftEncoder;
+}
 
 frc::QuadratureEncoder& DriveSubsystem::GetFrontRightEncoder() {
   return m_frontRightEncoder;
