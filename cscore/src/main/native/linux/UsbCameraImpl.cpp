@@ -31,12 +31,11 @@
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
+#include "FramePool.h"
 #include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
-#include "Notifier.h"
-#include "Telemetry.h"
 #include "UsbUtil.h"
 #include "cscore_cpp.h"
 
@@ -280,9 +279,8 @@ static std::string GetDescriptionImpl(const char* cpath) {
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier, Telemetry& telemetry,
                              const wpi::Twine& path)
-    : SourceImpl{name, logger, notifier, telemetry},
+    : SourceImpl{name, logger},
       m_path{path.str()},
       m_fd{-1},
       m_command_fd{eventfd(0, 0)},
@@ -487,8 +485,9 @@ void UsbCameraImpl::CameraThreadMain() {
           good = false;
         }
         if (good) {
-          PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
-                   width, height, image, wpi::Now());  // TODO: time
+          PutFrame(m_framePool.MakeFrame(
+              static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat), width,
+              height, image, wpi::Now()));  // TODO: time
         }
       }
 
@@ -712,7 +711,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
       DeviceConnect();
     }
     if (wasStreaming) DeviceStreamOn();
-    m_notifier.NotifySourceVideoMode(*this, newMode);
+    videoModeChanged(newMode);
     lock.lock();
   } else if (newMode.fps != m_mode.fps) {
     m_mode = newMode;
@@ -722,7 +721,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     if (wasStreaming) DeviceStreamOff();
     DeviceSetFPS();
     if (wasStreaming) DeviceStreamOn();
-    m_notifier.NotifySourceVideoMode(*this, newMode);
+    videoModeChanged(newMode);
     lock.lock();
   }
 
@@ -958,7 +957,7 @@ void UsbCameraImpl::DeviceCacheMode() {
   if (formatChanged) DeviceSetMode();
   if (fpsChanged) DeviceSetFPS();
 
-  m_notifier.NotifySourceVideoMode(*this, m_mode);
+  videoModeChanged(m_mode);
 }
 
 void UsbCameraImpl::DeviceCacheProperty(
@@ -1060,8 +1059,8 @@ void UsbCameraImpl::DeviceCacheProperty(
     rawPropPtr->propPair = *perIndex;
   }
 
-  NotifyPropertyCreated(*rawIndex, *rawPropPtr);
-  if (perPropPtr) NotifyPropertyCreated(*perIndex, *perPropPtr);
+  propertyCreated(*rawIndex, *rawPropPtr);
+  if (perPropPtr) propertyCreated(*perIndex, *perPropPtr);
 }
 
 void UsbCameraImpl::DeviceCacheProperties() {
@@ -1159,7 +1158,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
   }
-  m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
+  videoModesUpdated();
 }
 
 CS_StatusValue UsbCameraImpl::SendAndWait(Message&& msg) const {
@@ -1391,8 +1390,7 @@ CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSource(CS_SOURCE_USB, std::make_shared<UsbCameraImpl>(
-                                              name, inst.logger, inst.notifier,
-                                              inst.telemetry, path));
+                                              name, inst.GetLogger(), path));
 }
 
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
@@ -1485,7 +1483,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     ::closedir(dp);
   } else {
     // *status = ;
-    WPI_ERROR(Instance::GetInstance().logger, "Could not open /dev");
+    WPI_ERROR(Instance::GetInstance().GetLogger(), "Could not open /dev");
     return retval;
   }
 
