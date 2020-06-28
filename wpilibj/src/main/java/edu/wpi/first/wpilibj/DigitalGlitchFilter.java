@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -78,11 +78,11 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   }
 
   /**
-   * Assigns the Encoder to this glitch filter.
+   * Assigns the QuadratureEncoder to this glitch filter.
    *
-   * @param input The Encoder to add.
+   * @param input The QuadratureEncoder to add.
    */
-  public void add(Encoder input) {
+  public void add(QuadratureEncoder input) {
     add(input.m_aSource);
     add(input.m_bSource);
   }
@@ -107,11 +107,11 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   }
 
   /**
-   * Removes this filter from the given Encoder.
+   * Removes this filter from the given QuadratureEncoder.
    *
-   * @param input the Encoder to stop filtering.
+   * @param input the QuadratureEncoder to stop filtering.
    */
-  public void remove(Encoder input) {
+  public void remove(QuadratureEncoder input) {
     remove(input.m_aSource);
     remove(input.m_bSource);
   }

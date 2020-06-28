@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj.examples.swervebot;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -28,8 +28,8 @@ public class SwerveModule {
   private final SpeedController m_driveMotor;
   private final SpeedController m_turningMotor;
 
-  private final Encoder m_driveEncoder = new Encoder(0, 1);
-  private final Encoder m_turningEncoder = new Encoder(2, 3);
+  private final QuadratureEncoder m_driveEncoder = new QuadratureEncoder(0, 1);
+  private final QuadratureEncoder m_turningEncoder = new QuadratureEncoder(2, 3);
 
   private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
 

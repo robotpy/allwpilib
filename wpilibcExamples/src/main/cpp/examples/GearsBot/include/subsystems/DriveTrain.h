@@ -9,8 +9,8 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/AnalogInput.h>
-#include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc2/command/SubsystemBase.h>
@@ -77,8 +77,8 @@ class DriveTrain : public frc2::SubsystemBase {
 
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
-  frc::Encoder m_leftEncoder{1, 2};
-  frc::Encoder m_rightEncoder{3, 4};
+  frc::QuadratureEncoder m_leftEncoder{1, 2};
+  frc::QuadratureEncoder m_rightEncoder{3, 4};
   frc::AnalogInput m_rangefinder{6};
   frc::AnalogGyro m_gyro{1};
 };

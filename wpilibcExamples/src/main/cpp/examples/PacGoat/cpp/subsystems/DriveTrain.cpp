@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -63,8 +63,8 @@ void DriveTrain::TankDrive(double leftAxis, double rightAxis) {
 
 void DriveTrain::Stop() { m_robotDrive.TankDrive(0.0, 0.0); }
 
-frc::Encoder& DriveTrain::GetLeftEncoder() { return m_leftEncoder; }
+frc::QuadratureEncoder& DriveTrain::GetLeftEncoder() { return m_leftEncoder; }
 
-frc::Encoder& DriveTrain::GetRightEncoder() { return m_rightEncoder; }
+frc::QuadratureEncoder& DriveTrain::GetRightEncoder() { return m_rightEncoder; }
 
 double DriveTrain::GetAngle() { return m_gyro.GetAngle(); }

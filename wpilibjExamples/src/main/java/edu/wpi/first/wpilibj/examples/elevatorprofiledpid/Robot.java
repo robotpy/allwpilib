@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj.examples.elevatorprofiledpid;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -19,7 +19,7 @@ public class Robot extends TimedRobot {
   private static double kDt = 0.02;
 
   private final Joystick m_joystick = new Joystick(1);
-  private final Encoder m_encoder = new Encoder(1, 2);
+  private final QuadratureEncoder m_encoder = new QuadratureEncoder(1, 2);
   private final SpeedController m_motor = new PWMVictorSPX(1);
 
   // Create a PID controller whose setpoint's change is subject to maximum

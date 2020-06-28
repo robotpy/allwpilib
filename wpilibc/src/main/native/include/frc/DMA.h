@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,7 +12,7 @@
 #include "frc/ErrorBase.h"
 
 namespace frc {
-class Encoder;
+class QuadratureEncoder;
 class Counter;
 class DigitalSource;
 class DutyCycle;
@@ -32,8 +32,8 @@ class DMA : public ErrorBase {
   void SetPause(bool pause);
   void SetRate(int cycles);
 
-  void AddEncoder(const Encoder* encoder);
-  void AddEncoderPeriod(const Encoder* encoder);
+  void AddEncoder(const QuadratureEncoder* encoder);
+  void AddEncoderPeriod(const QuadratureEncoder* encoder);
 
   void AddCounter(const Counter* counter);
   void AddCounterPeriod(const Counter* counter);

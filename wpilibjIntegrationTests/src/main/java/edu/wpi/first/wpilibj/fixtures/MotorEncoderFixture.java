@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,25 +12,25 @@ import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
- * Represents a physically connected Motor and Encoder to allow for unit tests on these different
- * pairs<br> Designed to allow the user to easily setup and tear down the fixture to allow for
- * reuse. This class should be explicitly instantiated in the TestBed class to allow any test to
- * access this fixture. This allows tests to be mailable so that you can easily reconfigure the
- * physical testbed without breaking the tests.
+ * Represents a physically connected Motor and QuadratureEncoder to allow for unit tests on these
+ * allow for different pairs<br> Designed to allow the user to easily setup and tear down the
+ * fixture to reuse. This class should be explicitly instantiated in the TestBed class to allow any
+ * test to access this fixture. This allows tests to be mailable so that you can easily reconfigure
+ * the physical testbed without breaking the tests.
  */
 public abstract class MotorEncoderFixture<T extends SpeedController> implements ITestFixture {
   private static final Logger logger = Logger.getLogger(MotorEncoderFixture.class.getName());
   private boolean m_initialized = false;
   private boolean m_tornDown = false;
   protected T m_motor;
-  private Encoder m_encoder;
+  private QuadratureEncoder m_encoder;
   private final Counter[] m_counters = new Counter[2];
   protected DigitalInput m_alphaSource; // Stored so it can be freed at tear down
   protected DigitalInput m_betaSource;
@@ -79,7 +79,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
         m_betaSource = giveDigitalInputB();
 
 
-        m_encoder = new Encoder(m_alphaSource, m_betaSource);
+        m_encoder = new QuadratureEncoder(m_alphaSource, m_betaSource);
         m_counters[0] = new Counter(m_alphaSource);
         m_counters[1] = new Counter(m_betaSource);
         logger.fine("Creating the speed controller!");
@@ -109,7 +109,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    *
    * @return the encoder that this object refers too
    */
-  public Encoder getEncoder() {
+  public QuadratureEncoder getEncoder() {
     initialize();
     return m_encoder;
   }
@@ -223,7 +223,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
         throw new NullPointerException("MotorEncoderFixture had null params at teardown");
       }
     } else {
-      throw new RuntimeException(type + " Motor Encoder torn down multiple times");
+      throw new RuntimeException(type + " Motor QuadratureEncoder torn down multiple times");
     }
 
     return true;

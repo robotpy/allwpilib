@@ -8,8 +8,8 @@
 package edu.wpi.first.wpilibj.examples.differentialdrivebot;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -36,8 +36,8 @@ public class Drivetrain {
   private final SpeedController m_rightLeader = new PWMVictorSPX(3);
   private final SpeedController m_rightFollower = new PWMVictorSPX(4);
 
-  private final Encoder m_leftEncoder = new Encoder(0, 1);
-  private final Encoder m_rightEncoder = new Encoder(2, 3);
+  private final QuadratureEncoder m_leftEncoder = new QuadratureEncoder(0, 1);
+  private final QuadratureEncoder m_rightEncoder = new QuadratureEncoder(2, 3);
 
   private final SpeedControllerGroup m_leftGroup
       = new SpeedControllerGroup(m_leftLeader, m_leftFollower);

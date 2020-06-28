@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,7 @@
 #include <frc/Counter.h>
 #include <frc/DigitalSource.h>
 #include <frc/DutyCycle.h>
-#include <frc/Encoder.h>
+#include <frc/QuadratureEncoder.h>
 
 #include <hal/DMA.h>
 #include <hal/HALBase.h>
@@ -38,13 +38,13 @@ void DMA::SetRate(int cycles) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void DMA::AddEncoder(const Encoder* encoder) {
+void DMA::AddEncoder(const QuadratureEncoder* encoder) {
   int32_t status = 0;
   HAL_AddDMAEncoder(dmaHandle, encoder->m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void DMA::AddEncoderPeriod(const Encoder* encoder) {
+void DMA::AddEncoderPeriod(const QuadratureEncoder* encoder) {
   int32_t status = 0;
   HAL_AddDMAEncoderPeriod(dmaHandle, encoder->m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

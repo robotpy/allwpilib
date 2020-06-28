@@ -190,15 +190,15 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kSplitButtonChooser("Split Button Chooser"),
   /**
-   * Displays an {@link edu.wpi.first.wpilibj.Encoder} displaying its speed, total travelled
-   * distance, and its distance per tick.
+   * Displays an {@link edu.wpi.first.wpilibj.QuadratureEncoder} displaying its speed,
+   * total travelled distance, and its distance per tick.
    * <br>Supported types:
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.Encoder}</li>
+   * <li>{@link edu.wpi.first.wpilibj.QuadratureEncoder}</li>
    * </ul>
    * <br>This widget has no custom properties.
    */
-  kEncoder("Encoder"),
+  kQuadratureEncoder("QuadratureEncoder"),
   /**
    * Displays a {@link edu.wpi.first.wpilibj.SpeedController SpeedController}. The speed controller
    * will be controllable from the dashboard when test mode is enabled, but will otherwise be

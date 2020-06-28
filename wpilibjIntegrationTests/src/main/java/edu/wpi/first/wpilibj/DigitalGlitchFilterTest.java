@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -39,7 +39,7 @@ public class DigitalGlitchFilterTest extends AbstractComsSetup {
     final DigitalInput input2 = new DigitalInput(2);
     final DigitalInput input3 = new DigitalInput(3);
     final DigitalInput input4 = new DigitalInput(4);
-    final Encoder encoder5 = new Encoder(5, 6);
+    final QuadratureEncoder encoder5 = new QuadratureEncoder(5, 6);
     final Counter counter7 = new Counter(7);
 
     final DigitalGlitchFilter filter1 = new DigitalGlitchFilter();

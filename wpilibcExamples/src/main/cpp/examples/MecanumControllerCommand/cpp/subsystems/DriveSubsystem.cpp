@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -77,17 +77,19 @@ void DriveSubsystem::ResetEncoders() {
   m_rearRightEncoder.Reset();
 }
 
-frc::Encoder& DriveSubsystem::GetFrontLeftEncoder() {
+frc::QuadratureEncoder& DriveSubsystem::GetFrontLeftEncoder() {
   return m_frontLeftEncoder;
 }
 
-frc::Encoder& DriveSubsystem::GetRearLeftEncoder() { return m_rearLeftEncoder; }
+frc::QuadratureEncoder& DriveSubsystem::GetRearLeftEncoder() {
+  return m_rearLeftEncoder;
+}
 
-frc::Encoder& DriveSubsystem::GetFrontRightEncoder() {
+frc::QuadratureEncoder& DriveSubsystem::GetFrontRightEncoder() {
   return m_frontRightEncoder;
 }
 
-frc::Encoder& DriveSubsystem::GetRearRightEncoder() {
+frc::QuadratureEncoder& DriveSubsystem::GetRearRightEncoder() {
   return m_rearRightEncoder;
 }
 
