@@ -19,7 +19,6 @@ public interface Interpolatable<T> {
    * or lower bound.
    * @param endValue The upper bound, or end.
    * @param t How far between the lower and upper bound we are. This should be bounded in [0, 1].
-   * @return
    */
   @SuppressWarnings("ParameterName")
   T interpolate(T endValue, double t);
