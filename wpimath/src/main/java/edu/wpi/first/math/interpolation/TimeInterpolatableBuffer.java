@@ -40,7 +40,7 @@ public class TimeInterpolatableBuffer<T> {
    * @param historySizeSeconds  The history size of the buffer.
    * @param <T>                 The type of data to store in the buffer.
    */
-  public static <T extends Interpolatable<T>> TimeInterpolatableBuffer<T> createBuffer(
+  public static <T> TimeInterpolatableBuffer<T> createBuffer(
       InterpolateFunction<T> interpolateFunction, double historySizeSeconds) {
     return new TimeInterpolatableBuffer<>(interpolateFunction, historySizeSeconds);
   }

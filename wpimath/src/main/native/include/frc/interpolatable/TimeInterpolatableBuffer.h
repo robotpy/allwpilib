@@ -10,6 +10,7 @@
 #include <array>
 #include <utility>
 #include <vector>
+#include <functional>
 
 #include <wpi/MathExtras.h>
 
@@ -20,13 +21,22 @@ namespace frc {
 template <typename T>
 class TimeInterpolatableBuffer {
  public:
-  void addSample(units::second_t time, T sample) {
+  explicit TimeInterpolatableBuffer(std::function<T(const T&, const T&, double)> func
+    = [](const T& start, const T& end, double t) { return wpi::Lerp(start, end, t); }) :
+    m_interpolatingFunc(func) {}
+
+  void AddSample(units::second_t time, T sample) {
     // Add the new state into the vector.
     m_pastSnapshots.emplace_back(time, sample);
 
     // Remove the oldest snapshot if the vector exceeds our maximum size.
-    if (m_pastSnapshots.size() > kMaxPastObserverStates) {
-      m_pastSnapshots.erase(m_pastSnapshots.begin());
+    while (!m_pastSnapshots.empty()) {
+      const auto& entry = m_pastSnapshots.back();
+      if (time - entry.first >= m_historySize) {
+        m_pastSnapshots.pop_back();
+      } else {
+        return;
+      }
     }
   }
 
@@ -62,8 +72,8 @@ class TimeInterpolatableBuffer {
     // Because low and high are now the same (both "high"), we decrement low
     low -= 1;
 
-    std::pair<units::second_t, T> bottomBound = m_pastSnapshots[low];
-    std::pair<units::second_t, T> topBound = m_pastSnapshots[high];
+    const auto& bottomBound = m_pastSnapshots[low];
+    const auto& topBound = m_pastSnapshots[high];
 
     return wpi::Lerp(
         bottomBound.second, topBound.second,
@@ -71,8 +81,9 @@ class TimeInterpolatableBuffer {
   }
 
  private:
-  static constexpr size_t kMaxPastObserverStates = 300;
+  static constexpr units::second_t m_historySize = 10_s;
   std::vector<std::pair<units::second_t, T>> m_pastSnapshots;
+  std::function<T(const T&, const T&, double)> m_interpolatingFunc;
 };
 
 }  // namespace frc
