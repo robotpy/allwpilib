@@ -19,7 +19,7 @@ import edu.wpi.first.wpiutil.math.MathUtil;
  * were recorded is necessary, or for recording the past angles of mechanisms as measured
  * by encoders.
  *
- * @param <T> The Interpolatable stored in this buffer.
+ * @param <T> The type stored in this buffer.
  */
 public class TimeInterpolatableBuffer<T> {
 
@@ -65,6 +65,12 @@ public class TimeInterpolatableBuffer<T> {
     return new TimeInterpolatableBuffer<>(MathUtil::interpolate, historySizeSeconds);
   }
 
+  /**
+   * Add a sample to the buffer.
+   *
+   * @param timeSeconds The timestamp of the sample.
+   * @param sample The sample object.
+   */
   public void addSample(double timeSeconds, T sample) {
     cleanUp(timeSeconds);
     m_buffer.put(timeSeconds, sample);
@@ -81,6 +87,9 @@ public class TimeInterpolatableBuffer<T> {
     }
   }
 
+  /**
+   * Clear all old samples.
+   */
   public void clear() {
     m_buffer.clear();
   }

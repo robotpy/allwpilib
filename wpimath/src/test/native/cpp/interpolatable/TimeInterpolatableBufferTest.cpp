@@ -5,11 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <units/time.h>
-
 #include "frc/geometry/Rotation2d.h"
 #include "frc/interpolatable/TimeInterpolatableBuffer.h"
 #include "gtest/gtest.h"
+#include "units/time.h"
 
 TEST(TimeInterpolatableBufferTest, TestInterpolation) {
   frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{};
@@ -21,4 +20,7 @@ TEST(TimeInterpolatableBufferTest, TestInterpolation) {
   EXPECT_TRUE(buffer.Sample(1_s) == frc::Rotation2d(1_rad));
   buffer.AddSample(3_s, frc::Rotation2d(2_rad));
   EXPECT_TRUE(buffer.Sample(2_s) == frc::Rotation2d(1.5_rad));
+
+  buffer.AddSample(10.5_s, frc::Rotation2d(2_rad));
+  EXPECT_TRUE(buffer.Sample(0_s) == frc::Rotation2d(1_rad));
 }

@@ -8,9 +8,10 @@
 #pragma once
 
 #include <array>
+#include <functional>
+#include <map>
 #include <utility>
 #include <vector>
-#include <functional>
 
 #include <wpi/MathExtras.h>
 
@@ -18,26 +19,51 @@
 
 namespace frc {
 
+/**
+ * The TimeInterpolatableBuffer provides an easy way to estimate past
+ * measurements. One application might be in conjunction with the
+ * DifferentialDrivePoseEstimator, where knowledge of the robot pose at the time
+ * when vision or other global measurement were recorded is necessary, or for
+ * recording the past angles of mechanisms as measured by encoders.
+ *
+ * @param <T> The type stored in this buffer.
+ */
 template <typename T>
 class TimeInterpolatableBuffer {
  public:
-  explicit TimeInterpolatableBuffer(std::function<T(const T&, const T&, double)> func
-    = [](const T& start, const T& end, double t) { return wpi::Lerp(start, end, t); }) :
-    m_interpolatingFunc(func) {}
+  /**
+   * Create a new TimeInterpolatableBuffer. By default, the history size is 10
+   * seconds and the interpolation function is wpi::Lerp.
+   *
+   * @param historySizeSeconds  The history size of the buffer.
+   * @param interpolateFunction The function used to interpolate between values.
+   */
+  explicit TimeInterpolatableBuffer(
+      units::second_t historySize = 10_s,
+      std::function<T(const T&, const T&, double)> func =
+          [](const T& start, const T& end, double t) {
+            return wpi::Lerp(start, end, t);
+          })
+      : m_historySize(historySize), m_interpolatingFunc(func) {}
 
+  /**
+   * Add a sample to the buffer.
+   *
+   * @param time   The timestamp of the sample.
+   * @param sample The sample object.
+   */
   void AddSample(units::second_t time, T sample) {
     // Add the new state into the vector.
-    m_pastSnapshots.emplace_back(time, sample);
 
-    // Remove the oldest snapshot if the vector exceeds our maximum size.
-    while (!m_pastSnapshots.empty()) {
-      const auto& entry = m_pastSnapshots.back();
-      if (time - entry.first >= m_historySize) {
-        m_pastSnapshots.pop_back();
-      } else {
-        return;
-      }
-    }
+    if (m_pastSnapshots.size() == 0 || time > m_pastSnapshots.back().first)
+      m_pastSnapshots.emplace_back(time, sample);
+    else
+      m_pastSnapshots.insert(
+          std::upper_bound(m_pastSnapshots.begin(), m_pastSnapshots.end(),
+                           std::pair(time, sample), m_comparator),
+          std::pair(time, sample));
+    while (time - m_pastSnapshots[0].first > m_historySize)
+      m_pastSnapshots.erase(m_pastSnapshots.begin());
   }
 
   void Clear() { m_pastSnapshots.clear(); }
@@ -51,39 +77,27 @@ class TimeInterpolatableBuffer {
     // vector that has a timestamp that is equal to or greater than the vision
     // measurement timestamp.
 
+    if (time <= m_pastSnapshots.front().first)
+      return m_pastSnapshots.front().second;
+    if (time > m_pastSnapshots.back().first)
+      return m_pastSnapshots.back().second;
     if (m_pastSnapshots.size() < 2) return m_pastSnapshots[0].second;
 
-    int low = 0;
-    int high = m_pastSnapshots.size() - 1;
+    // Get the iterator which has a key no less than the requested key.
+    auto upper_bound =
+        std::lower_bound(m_pastSnapshots.begin(), m_pastSnapshots.end(), std::pair(time, T()), m_comparator);
+    auto lower_bound = upper_bound - 1;
 
-    while (low != high) {
-      int mid = (low + high) / 2.0;
-      if (m_pastSnapshots[mid].first < time) {
-        // This index and everything under it are less than the requested
-        // time. Therefore, we can discard them.
-        low = mid + 1;
-      } else {
-        // t is at least as large as the element at this index. This means that
-        // anything after it cannot be what we are looking for.
-        high = mid;
-      }
-    }
-
-    // Because low and high are now the same (both "high"), we decrement low
-    low -= 1;
-
-    const auto& bottomBound = m_pastSnapshots[low];
-    const auto& topBound = m_pastSnapshots[high];
-
-    return wpi::Lerp(
-        bottomBound.second, topBound.second,
-        (time - bottomBound.first) / (topBound.first - bottomBound.first));
+    return m_interpolatingFunc(
+        m_pastSnapshots.at(lower_bound).second, m_pastSnapshots.at(upper_bound).second,
+        ((time - m_pastSnapshots.at(lower_bound).first) / (m_pastSnapshots.at(upper_bound).first - m_pastSnapshots.at(lower_bound).first)));
   }
 
  private:
-  static constexpr units::second_t m_historySize = 10_s;
+  units::second_t m_historySize;
   std::vector<std::pair<units::second_t, T>> m_pastSnapshots;
   std::function<T(const T&, const T&, double)> m_interpolatingFunc;
+  std::function<bool(const std::pair<units::second_t, T>&, const std::pair<units::second_t, T>&)> m_comparator = [](const auto& a, const auto& b) { return b.first > a.first; };
 };
 
 }  // namespace frc
