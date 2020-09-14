@@ -37,6 +37,8 @@ static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 namespace hal {
 namespace init {
 void InitializeHAL() {
+  InitializeCommonI2C();
+
   InitializeAccelerometerData();
   InitializeAddressableLEDData();
   InitializeAnalogGyroData();
