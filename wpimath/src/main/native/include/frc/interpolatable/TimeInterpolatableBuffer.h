@@ -89,8 +89,7 @@ class TimeInterpolatableBuffer {
     auto lower_bound = upper_bound - 1;
 
     double t = ((time - lower_bound->first) /
-                                (upper_bound->first -
-                                 lower_bound->first));
+                (upper_bound->first - lower_bound->first));
 
     return m_interpolatingFunc(lower_bound->second, upper_bound->second, t);
   }
