@@ -59,7 +59,7 @@ class TimeInterpolatableBuffer {
     else
       m_pastSnapshots.insert(
           std::upper_bound(m_pastSnapshots.begin(), m_pastSnapshots.end(),
-                           std::pair(time, sample), m_comparator),
+                           time, [](auto t, const auto& pair) { return t < pair.first; }),
           std::pair(time, sample));
     while (time - m_pastSnapshots[0].first > m_historySize)
       m_pastSnapshots.erase(m_pastSnapshots.begin());
@@ -85,7 +85,8 @@ class TimeInterpolatableBuffer {
     // Get the iterator which has a key no less than the requested key.
     auto upper_bound =
         std::lower_bound(m_pastSnapshots.begin(), m_pastSnapshots.end(),
-                         std::pair(time, T()), m_comparator);
+                         time, [](const auto& pair, auto t) { return t > pair.first; });
+
     auto lower_bound = upper_bound - 1;
 
     double t = ((time - lower_bound->first) /
@@ -98,10 +99,6 @@ class TimeInterpolatableBuffer {
   units::second_t m_historySize;
   std::vector<std::pair<units::second_t, T>> m_pastSnapshots;
   std::function<T(T, T, double)> m_interpolatingFunc;
-  std::function<bool(const std::pair<units::second_t, T>&,
-                     const std::pair<units::second_t, T>&)>
-      m_comparator =
-          [](const auto& a, const auto& b) { return b.first > a.first; };
 };
 
 }  // namespace frc
