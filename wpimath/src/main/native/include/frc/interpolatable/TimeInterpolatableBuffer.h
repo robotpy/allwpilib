@@ -54,7 +54,6 @@ class TimeInterpolatableBuffer {
    */
   void AddSample(units::second_t time, T sample) {
     // Add the new state into the vector.
-
     if (m_pastSnapshots.size() == 0 || time > m_pastSnapshots.back().first)
       m_pastSnapshots.emplace_back(time, sample);
     else
@@ -85,19 +84,25 @@ class TimeInterpolatableBuffer {
 
     // Get the iterator which has a key no less than the requested key.
     auto upper_bound =
-        std::lower_bound(m_pastSnapshots.begin(), m_pastSnapshots.end(), std::pair(time, T()), m_comparator);
+        std::lower_bound(m_pastSnapshots.begin(), m_pastSnapshots.end(),
+                         std::pair(time, T()), m_comparator);
     auto lower_bound = upper_bound - 1;
 
-    return m_interpolatingFunc(
-        m_pastSnapshots.at(lower_bound).second, m_pastSnapshots.at(upper_bound).second,
-        ((time - m_pastSnapshots.at(lower_bound).first) / (m_pastSnapshots.at(upper_bound).first - m_pastSnapshots.at(lower_bound).first)));
+    double t = ((time - lower_bound->first) /
+                                (upper_bound->first -
+                                 lower_bound->first));
+
+    return m_interpolatingFunc(lower_bound->second, upper_bound->second, t);
   }
 
  private:
   units::second_t m_historySize;
   std::vector<std::pair<units::second_t, T>> m_pastSnapshots;
-  std::function<T(const T&, const T&, double)> m_interpolatingFunc;
-  std::function<bool(const std::pair<units::second_t, T>&, const std::pair<units::second_t, T>&)> m_comparator = [](const auto& a, const auto& b) { return b.first > a.first; };
+  std::function<T(T, T, double)> m_interpolatingFunc;
+  std::function<bool(const std::pair<units::second_t, T>&,
+                     const std::pair<units::second_t, T>&)>
+      m_comparator =
+          [](const auto& a, const auto& b) { return b.first > a.first; };
 };
 
 }  // namespace frc
