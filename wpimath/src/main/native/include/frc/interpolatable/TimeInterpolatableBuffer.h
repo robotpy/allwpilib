@@ -98,7 +98,7 @@ class TimeInterpolatableBuffer {
  private:
   units::second_t m_historySize;
   std::vector<std::pair<units::second_t, T>> m_pastSnapshots;
-  std::function<T(T, T, double)> m_interpolatingFunc;
+  std::function<T(const T&, const T&, double)> m_interpolatingFunc;
 };
 
 }  // namespace frc
