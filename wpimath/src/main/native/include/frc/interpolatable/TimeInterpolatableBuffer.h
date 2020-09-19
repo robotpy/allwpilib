@@ -58,8 +58,9 @@ class TimeInterpolatableBuffer {
       m_pastSnapshots.emplace_back(time, sample);
     else
       m_pastSnapshots.insert(
-          std::upper_bound(m_pastSnapshots.begin(), m_pastSnapshots.end(),
-                           time, [](auto t, const auto& pair) { return t < pair.first; }),
+          std::upper_bound(
+              m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
+              [](auto t, const auto& pair) { return t < pair.first; }),
           std::pair(time, sample));
     while (time - m_pastSnapshots[0].first > m_historySize)
       m_pastSnapshots.erase(m_pastSnapshots.begin());
@@ -83,9 +84,9 @@ class TimeInterpolatableBuffer {
     if (m_pastSnapshots.size() < 2) return m_pastSnapshots[0].second;
 
     // Get the iterator which has a key no less than the requested key.
-    auto upper_bound =
-        std::lower_bound(m_pastSnapshots.begin(), m_pastSnapshots.end(),
-                         time, [](const auto& pair, auto t) { return t > pair.first; });
+    auto upper_bound = std::lower_bound(
+        m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
+        [](const auto& pair, auto t) { return t > pair.first; });
 
     auto lower_bound = upper_bound - 1;
 
