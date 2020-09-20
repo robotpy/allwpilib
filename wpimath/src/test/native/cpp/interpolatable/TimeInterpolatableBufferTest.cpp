@@ -11,7 +11,7 @@
 #include "units/time.h"
 
 TEST(TimeInterpolatableBufferTest, TestInterpolation) {
-  frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{};
+  frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{10_s};
 
   buffer.AddSample(0_s, frc::Rotation2d(0_rad));
   EXPECT_TRUE(buffer.Sample(0_s) == frc::Rotation2d(0_rad));

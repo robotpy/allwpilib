@@ -78,7 +78,7 @@ public class TimeInterpolatableBuffer<T> {
 
   private void cleanUp(double time) {
     while (!m_buffer.isEmpty()) {
-      var entry = m_buffer.lastEntry();
+      var entry = m_buffer.firstEntry();
       if (time - entry.getKey() >= m_historySize) {
         m_buffer.remove(entry.getKey());
       } else {

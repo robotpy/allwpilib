@@ -39,7 +39,7 @@ class TimeInterpolatableBuffer {
    * @param interpolateFunction The function used to interpolate between values.
    */
   explicit TimeInterpolatableBuffer(
-      units::second_t historySize = 10_s,
+      units::second_t historySize,
       std::function<T(const T&, const T&, double)> func =
           [](const T& start, const T& end, double t) {
             return wpi::Lerp(start, end, t);
