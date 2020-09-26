@@ -56,8 +56,8 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
   }
 
   @Override
-  public SimpleWidget add(String title, Object defaultValue) throws IllegalArgumentException {
-    return m_helper.add(title, defaultValue);
+  public SimpleWidget add(String title, Object value) {
+    return m_helper.add(title, value);
   }
 
   @Override
