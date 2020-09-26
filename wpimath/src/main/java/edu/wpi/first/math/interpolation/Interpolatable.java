@@ -8,8 +8,9 @@
 package edu.wpi.first.math.interpolation;
 
 /**
- * An object should extend interpolatable if you wish to linearly interpolate between a lower and
- * upper bound, such as a robot position on the field between timesteps.
+ * An object should extend interpolatable if you wish to interpolate between a lower and
+ * upper bound, such as a robot position on the field between timesteps. This behavior can
+ * be linear or nonlinear.
  * @param <T> The class that is interpolatable.
  */
 public interface Interpolatable<T> {
