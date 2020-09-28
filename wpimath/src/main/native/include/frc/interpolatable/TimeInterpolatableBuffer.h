@@ -15,6 +15,7 @@
 
 #include <wpi/MathExtras.h>
 
+#include "frc/geometry/Pose2d.h"
 #include "units/time.h"
 
 namespace frc {
@@ -32,19 +33,28 @@ template <typename T>
 class TimeInterpolatableBuffer {
  public:
   /**
-   * Create a new TimeInterpolatableBuffer. By default, the history size is 10
-   * seconds and the interpolation function is wpi::Lerp.
+   * Create a new TimeInterpolatableBuffer.
    *
    * @param historySizeSeconds  The history size of the buffer.
    * @param interpolateFunction The function used to interpolate between values.
    */
   explicit TimeInterpolatableBuffer(
       units::second_t historySize,
-      std::function<T(const T&, const T&, double)> func =
-          [](const T& start, const T& end, double t) {
-            return wpi::Lerp(start, end, t);
-          })
+      std::function<T(const T&, const T&, double)> func)
       : m_historySize(historySize), m_interpolatingFunc(func) {}
+
+  /**
+   * Create a new TimeInterpolatableBuffer. By default, the interpolation
+   * function is wpi::Lerp except for Pose2d, which uses pose exponentials.
+   *
+   * @param historySizeSeconds  The history size of the buffer.
+   * @param interpolateFunction The function used to interpolate between values.
+   */
+  explicit TimeInterpolatableBuffer(units::second_t historySize)
+      : m_historySize(historySize),
+        m_interpolatingFunc([](const T& start, const T& end, double t) {
+          return wpi::Lerp(start, end, t);
+        }) {}
 
   /**
    * Add a sample to the buffer.
@@ -101,5 +111,23 @@ class TimeInterpolatableBuffer {
   std::vector<std::pair<units::second_t, T>> m_pastSnapshots;
   std::function<T(const T&, const T&, double)> m_interpolatingFunc;
 };
+
+// Template specialization to ensure that Pose2d uses pose exponential
+template <>
+TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
+    units::second_t historySize)
+    : m_historySize(historySize),
+      m_interpolatingFunc([](const Pose2d& start, const Pose2d& end, double t) {
+        std::cout << "Pose2d" << std::endl;
+        if (t < 0) {
+          return start;
+        } else if (t >= 1) {
+          return end;
+        } else {
+          Twist2d twist = start.Log(end);
+          Twist2d scaledTwist = twist * t;
+          return start.Exp(scaledTwist);
+        }
+      }) {}
 
 }  // namespace frc
