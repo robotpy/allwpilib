@@ -38,7 +38,7 @@ class TimeInterpolatableBuffer {
    * @param historySizeSeconds  The history size of the buffer.
    * @param interpolateFunction The function used to interpolate between values.
    */
-  explicit TimeInterpolatableBuffer(
+  TimeInterpolatableBuffer(
       units::second_t historySize,
       std::function<T(const T&, const T&, double)> func)
       : m_historySize(historySize), m_interpolatingFunc(func) {}
