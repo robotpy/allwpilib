@@ -117,7 +117,6 @@ TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
     units::second_t historySize)
     : m_historySize(historySize),
       m_interpolatingFunc([](const Pose2d& start, const Pose2d& end, double t) {
-        std::cout << "Pose2d" << std::endl;
         if (t < 0) {
           return start;
         } else if (t >= 1) {
