@@ -29,9 +29,25 @@ namespace {
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(DIOValue, "DIO");
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DigitalPWMDutyCycle, "DPWM");
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DutyCycleOutput, "DutyCycle");
+
+class DigitalIONameAccessor : public NameInfo {
+ public:
+  bool GetDisplayName(char* buf, size_t size, const char* defaultName,
+                      int index) const {
+    const char* displayName = HALSIM_GetDIODisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+      return true;
+    } else {
+      GetLabel(buf, size, defaultName, index);
+      return false;
+    }
+  }
+};
+
 }  // namespace
 
-static IniSaver<NameInfo> gDIO{"DIO"};
+static IniSaver<DigitalIONameAccessor> gDIO{"DIO"};
 static std::vector<std::unique_ptr<DIOValueSource>> gDIOSources;
 static std::vector<std::unique_ptr<DigitalPWMDutyCycleSource>> gDPWMSources;
 static std::vector<std::unique_ptr<DutyCycleOutputSource>> gDutyCycleSources;
@@ -139,16 +155,17 @@ static void DisplayDIO() {
       DutyCycleOutputSource* dutyCycleSource = nullptr;
       auto& info = gDIO[i];
       char label[128];
+      bool hasDisplayName = false;
       if (pwmMap[i] > 0) {
         dpwmSource = gDPWMSources[pwmMap[i] - 1].get();
-        info.GetLabel(label, sizeof(label), "PWM", i);
+        hasDisplayName = info.GetDisplayName(label, sizeof(label), "PWM", i);
         if (auto simDevice = HALSIM_GetDIOSimDevice(i)) {
           LabelSimDevice(label, simDevice);
         } else {
           dpwmSource->LabelText(label, "%0.3f", dpwmSource->GetValue());
         }
       } else if (encoderMap[i] > 0) {
-        info.GetLabel(label, sizeof(label), " In", i);
+        hasDisplayName = info.GetDisplayName(label, sizeof(label), " In", i);
         if (auto simDevice = HALSIM_GetEncoderSimDevice(encoderMap[i] - 1)) {
           LabelSimDevice(label, simDevice);
         } else {
@@ -160,7 +177,7 @@ static void DisplayDIO() {
         }
       } else if (dutyCycleMap[i] > 0) {
         dutyCycleSource = gDutyCycleSources[dutyCycleMap[i] - 1].get();
-        info.GetLabel(label, sizeof(label), "Dty", i);
+        hasDisplayName = info.GetDisplayName(label, sizeof(label), "Dty", i);
         if (auto simDevice =
                 HALSIM_GetDutyCycleSimDevice(dutyCycleMap[i] - 1)) {
           LabelSimDevice(label, simDevice);
@@ -170,7 +187,7 @@ static void DisplayDIO() {
             HALSIM_SetDutyCycleOutput(dutyCycleMap[i] - 1, val);
         }
       } else if (!HALSIM_GetDIOIsInput(i)) {
-        info.GetLabel(label, sizeof(label), "Out", i);
+        hasDisplayName = info.GetDisplayName(label, sizeof(label), "Out", i);
         if (auto simDevice = HALSIM_GetDIOSimDevice(i)) {
           LabelSimDevice(label, simDevice);
         } else {
@@ -178,7 +195,7 @@ static void DisplayDIO() {
               label, "%s", dioSource->GetValue() != 0 ? "1 (high)" : "0 (low)");
         }
       } else {
-        info.GetLabel(label, sizeof(label), " In", i);
+        hasDisplayName = info.GetDisplayName(label, sizeof(label), " In", i);
         if (auto simDevice = HALSIM_GetDIOSimDevice(i)) {
           LabelSimDevice(label, simDevice);
         } else {
@@ -188,10 +205,12 @@ static void DisplayDIO() {
             HALSIM_SetDIOValue(i, val);
         }
       }
-      if (info.PopupEditName(i)) {
-        dioSource->SetName(info.GetName());
-        if (dpwmSource) dpwmSource->SetName(info.GetName());
-        if (dutyCycleSource) dutyCycleSource->SetName(info.GetName());
+      if (!hasDisplayName) {
+        if (info.PopupEditName(i)) {
+          dioSource->SetName(info.GetName());
+          if (dpwmSource) dpwmSource->SetName(info.GetName());
+          if (dutyCycleSource) dutyCycleSource->SetName(info.GetName());
+        }
       }
       ImGui::PopID();
     }

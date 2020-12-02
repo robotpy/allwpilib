@@ -24,9 +24,25 @@ using namespace halsimgui;
 
 namespace {
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(AnalogOutVoltage, "AOut");
+
+class AnalogOutNameAccessor : public NameInfo {
+ public:
+  bool GetDisplayName(char* buf, size_t size, const char* defaultName,
+                      int index) const {
+    const char* displayName = HALSIM_GetAnalogOutDisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+      return true;
+    } else {
+      GetLabel(buf, size, defaultName, index);
+      return false;
+    }
+  }
+};
 }  // namespace
 
-static IniSaver<NameInfo> gAnalogOuts{"AnalogOut"};  // indexed by channel
+static IniSaver<AnalogOutNameAccessor> gAnalogOuts{
+    "AnalogOut"};  // indexed by channel
 static std::vector<std::unique_ptr<AnalogOutVoltageSource>> gAnalogOutSources;
 
 static void UpdateAnalogOutSources() {
@@ -51,19 +67,22 @@ static void DisplayAnalogOutputs() {
 
   if (count == 0) return;
 
-  if (SimDeviceGui::StartDevice("Analog Outputs")) {
+  if (SimDeviceGui::StartDevice("Analog Outputs", "Analog Outputs")) {
     for (int i = 0, iend = gAnalogOutSources.size(); i < iend; ++i) {
       if (auto source = gAnalogOutSources[i].get()) {
         ImGui::PushID(i);
 
         auto& info = gAnalogOuts[i];
         char label[128];
-        info.GetLabel(label, sizeof(label), "Out", i);
+        bool hasDisplayName =
+            info.GetDisplayName(label, sizeof(label), "Out", i);
         HAL_Value value = HAL_MakeDouble(source->GetValue());
         SimDeviceGui::DisplayValueSource(label, true, &value, source);
 
-        if (info.PopupEditName(i)) {
-          if (source) source->SetName(info.GetName());
+        if (!hasDisplayName) {
+          if (info.PopupEditName(i)) {
+            if (source) source->SetName(info.GetName());
+          }
         }
         ImGui::PopID();
       }

@@ -27,9 +27,24 @@ using namespace halsimgui;
 namespace {
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(RelayForward, "RelayFwd");
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(RelayReverse, "RelayRev");
+
+class RelayNameAccessor : public NameInfo {
+ public:
+  bool GetDisplayName(char* buf, size_t size, const char* defaultName,
+                      int index) const {
+    const char* displayName = HALSIM_GetRelayDisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+      return true;
+    } else {
+      std::snprintf(buf, size, "%s[%d]###Name%d", defaultName, index, index);
+      return false;
+    }
+  }
+};
 }  // namespace
 
-static IniSaver<NameInfo> gRelays{"Relay"};
+static IniSaver<RelayNameAccessor> gRelays{"Relay"};
 static std::vector<std::unique_ptr<RelayForwardSource>> gRelayForwardSources;
 static std::vector<std::unique_ptr<RelayReverseSource>> gRelayReverseSources;
 

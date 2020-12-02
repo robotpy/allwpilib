@@ -35,6 +35,18 @@ struct EncoderInfo : public NameInfo, public OpenInfo {
     NameInfo::WriteIni(out);
     OpenInfo::WriteIni(out);
   }
+
+  bool GetDisplayName(char* buf, size_t size, const char* defaultName,
+                      int index, int channelA, int channelB) const {
+    const char* displayName = HALSIM_GetEncoderDisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+      return true;
+    } else {
+      GetLabel(buf, size, defaultName, channelA, channelB);
+      return false;
+    }
+  }
 };
 
 class EncoderSource {
@@ -208,7 +220,8 @@ static void DisplayEncoders() {
         // build header name
         auto& info = gEncoders[chA];
         char name[128];
-        info.GetLabel(name, sizeof(name), "Encoder", chA, chB);
+        bool hasDisplayName =
+            info.GetDisplayName(name, sizeof(name), "Encoder", i, chA, chB);
 
         // header
         bool open = ImGui::CollapsingHeader(
@@ -216,8 +229,10 @@ static void DisplayEncoders() {
         info.SetOpen(open);
 
         // context menu to change name
-        if (info.PopupEditName(chA)) {
-          source->SetName(info.GetName());
+        if (!hasDisplayName) {
+          if (info.PopupEditName(chA)) {
+            source->SetName(info.GetName());
+          }
         }
 
         if (open) {

@@ -32,10 +32,27 @@ struct PCMSource {
   std::vector<std::unique_ptr<PCMSolenoidOutputSource>> solenoids;
   int initCount = 0;
 };
+
+class SolenoidNameAccessor : public NameInfo {
+ public:
+  bool GetDisplayName(char* buf, size_t size, int pcmIndex,
+                      int solenoidIndex) const {
+    const char* displayName =
+        HALSIM_GetSolenoidDisplayName(pcmIndex, solenoidIndex);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+      return true;
+    } else {
+      GetLabel(buf, size, "Solenoid", solenoidIndex);
+      return false;
+    }
+  }
+};
+
 }  // namespace
 
 static IniSaver<OpenInfo> gPCMs{"PCM"};
-static IniSaver<NameInfo> gSolenoids{"Solenoid"};
+static IniSaver<SolenoidNameAccessor> gSolenoids{"Solenoid"};
 static std::vector<PCMSource> gPCMSources;
 
 static void UpdateSolenoidSources() {
@@ -99,12 +116,14 @@ static void DisplaySolenoids() {
       for (int j = 0; j < numChannels; ++j) {
         if (!pcmSource.solenoids[j]) continue;
         auto& info = gSolenoids[i * numChannels + j];
-        info.GetLabel(name, sizeof(name), "Solenoid", j);
+        bool hasDisplayName = info.GetDisplayName(name, sizeof(name), i, j);
         ImGui::PushID(j);
         pcmSource.solenoids[j]->LabelText(name, "%s",
                                           channels[j] == 1 ? "On" : "Off");
-        if (info.PopupEditName(j)) {
-          pcmSource.solenoids[j]->SetName(info.GetName());
+        if (!hasDisplayName) {
+          if (info.PopupEditName(j)) {
+            pcmSource.solenoids[j]->SetName(info.GetName());
+          }
         }
         ImGui::PopID();
       }

@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -37,6 +38,7 @@ struct ElementInfo : public NameInfo, public OpenInfo {
     NameInfo::WriteIni(out);
     OpenInfo::WriteIni(out);
   }
+
   bool visible = true;  // not saved
 };
 
@@ -96,15 +98,19 @@ void SimDeviceGui::Add(std::function<void()> execute) {
   if (execute) gDeviceExecutors.emplace_back(std::move(execute));
 }
 
-bool SimDeviceGui::StartDevice(const char* label, ImGuiTreeNodeFlags flags) {
+bool SimDeviceGui::StartDevice(const char* label, const char* displayName,
+                               ImGuiTreeNodeFlags flags) {
   auto& element = gElements[label];
   if (!element.visible) return false;
 
   char name[128];
   element.GetLabel(name, sizeof(name), label);
 
+  const char* nameToUse = displayName[0] != '\0' ? displayName : name;
+
   bool open = ImGui::CollapsingHeader(
-      name, flags | (element.IsOpen() ? ImGuiTreeNodeFlags_DefaultOpen : 0));
+      nameToUse,
+      flags | (element.IsOpen() ? ImGuiTreeNodeFlags_DefaultOpen : 0));
   element.SetOpen(open);
   element.PopupEditName(label);
 
@@ -245,7 +251,9 @@ static void SimDeviceDisplayDevice(const char* name, void*,
   auto it = gElements.find(name);
   if (it != gElements.end() && !it->second.visible) return;
 
-  if (SimDeviceGui::StartDevice(name)) {
+  const char* displayName = HALSIM_GetSimDeviceDisplayName(handle);
+
+  if (SimDeviceGui::StartDevice(name, displayName)) {
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     HALSIM_EnumerateSimValues(handle, nullptr, SimDeviceDisplayValue);
     ImGui::PopItemWidth();
@@ -282,11 +290,5 @@ HAL_Bool HALSIMGUI_DeviceTreeDisplayValue(const char* name, HAL_Bool readonly,
                                           int32_t numOptions) {
   return SimDeviceGui::DisplayValue(name, readonly, value, options, numOptions);
 }
-
-HAL_Bool HALSIMGUI_DeviceTreeStartDevice(const char* label, int32_t flags) {
-  return SimDeviceGui::StartDevice(label, flags);
-}
-
-void HALSIMGUI_DeviceTreeFinishDevice(void) { SimDeviceGui::FinishDevice(); }
 
 }  // extern "C"
