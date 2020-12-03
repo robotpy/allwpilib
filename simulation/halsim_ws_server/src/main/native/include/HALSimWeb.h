@@ -39,8 +39,10 @@ class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
   bool Initialize();
   void Start();
 
-  bool RegisterWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
-  void CloseWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
+  bool AcceptableWebsocket(wpi::StringRef requestUrl);
+  bool RegisterWebsocket(wpi::StringRef requestUrl,
+                         std::shared_ptr<HALSimBaseWebSocketConnection> hws);
+  void CloseWebsocket(wpi::StringRef requestUrl);
 
   // network -> sim
   void OnNetValueChanged(const wpi::json& msg);
@@ -55,7 +57,7 @@ class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
 
  private:
   // connected http connection that contains active websocket
-  std::weak_ptr<HALSimBaseWebSocketConnection> m_hws;
+  wpi::StringMap<std::weak_ptr<HALSimBaseWebSocketConnection>> m_conns;
 
   wpi::uv::Loop& m_loop;
   std::shared_ptr<wpi::uv::Tcp> m_server;

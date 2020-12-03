@@ -24,8 +24,15 @@ namespace uv = wpi::uv;
 using namespace wpilibws;
 
 bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
-  if (m_request.GetUrl() != m_server->GetServerUri()) {
+  wpi::errs() << "Request URL " << m_request.GetUrl() << "\n";
+  if (!m_request.GetUrl().startswith(m_server->GetServerUri()) &&
+      m_request.GetUrl().count("/") > 1) {
     MySendError(404, "invalid websocket address");
+    return false;
+  }
+
+  if (!m_server->AcceptableWebsocket(m_request.GetUrl())) {
+    MySendError(409, "Identifier already in use.");
     return false;
   }
 
@@ -36,11 +43,9 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
   m_websocket->open.connect_extended([this](auto conn, wpi::StringRef) {
     conn.disconnect();  // one-shot
 
-    if (!m_server->RegisterWebsocket(shared_from_this())) {
-      Log(409);
-      m_websocket->Fail(409, "Only a single simulation websocket is allowed");
-      return;
-    }
+    // Can ignore the return result because IsValidWsUpgrade validates this
+    // already
+    m_server->RegisterWebsocket(m_request.GetUrl(), shared_from_this());
 
     Log(200);
     m_isWsConnected = true;
@@ -59,7 +64,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
     } catch (const wpi::json::parse_error& e) {
       std::string err("JSON parse failed: ");
       err += e.what();
-      m_websocket->Fail(400, err);
+      m_websocket->Fail(1002, err);
       return;
     }
     m_server->OnNetValueChanged(j);
@@ -71,7 +76,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
       wpi::errs() << "HALWebSim: websocket disconnected\n";
       m_isWsConnected = false;
 
-      m_server->CloseWebsocket(shared_from_this());
+      m_server->CloseWebsocket(m_request.GetUrl());
     }
   });
 }

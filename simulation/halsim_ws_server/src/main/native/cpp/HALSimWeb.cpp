@@ -25,7 +25,8 @@ using namespace wpilibws;
 
 HALSimWeb::HALSimWeb(wpi::uv::Loop& loop, ProviderContainer& providers,
                      HALSimWSProviderSimDevices& simDevicesProvider)
-    : m_loop(loop),
+    : m_conns{1},
+      m_loop(loop),
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
@@ -113,36 +114,49 @@ void HALSimWeb::Start() {
   wpi::outs() << "WebSocket URI: " << m_uri << "\n";
 }
 
+bool HALSimWeb::AcceptableWebsocket(wpi::StringRef requestUrl) {
+  auto clientIdent = requestUrl.substr(GetServerUri().size() + 1);
+
+  return m_conns.find(clientIdent) == m_conns.end() ||
+         !m_conns.lookup(clientIdent).expired();
+}
+
 bool HALSimWeb::RegisterWebsocket(
+    wpi::StringRef requestUrl,
     std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
-  if (m_hws.lock()) {
+  auto clientIdent = requestUrl.substr(GetServerUri().size() + 1);
+
+  if (m_conns.find(clientIdent) != m_conns.end() &&
+      !m_conns.lookup(clientIdent).expired()) {
     return false;
   }
 
-  m_hws = hws;
+  auto& entry = m_conns[clientIdent];
+  if (entry.expired()) {
+    entry = std::weak_ptr<HALSimBaseWebSocketConnection>(hws);
+  }
 
-  m_simDevicesProvider.OnNetworkConnected(hws);
+  m_simDevicesProvider.OnNetworkConnected(clientIdent, hws);
 
   // notify all providers that they should use this new websocket instead
-  m_providers.ForEach([hws](std::shared_ptr<HALSimWSBaseProvider> provider) {
-    provider->OnNetworkConnected(hws);
-  });
+  m_providers.ForEach(
+      [hws, clientIdent](std::shared_ptr<HALSimWSBaseProvider> provider) {
+        provider->OnNetworkConnected(clientIdent, hws);
+      });
 
   return true;
 }
 
-void HALSimWeb::CloseWebsocket(
-    std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
+void HALSimWeb::CloseWebsocket(wpi::StringRef requestUrl) {
+  auto clientIdent = requestUrl.substr(GetServerUri().size() + 1);
   // Inform the providers that they need to cancel callbacks
-  m_simDevicesProvider.OnNetworkDisconnected();
+  m_simDevicesProvider.OnNetworkDisconnected(clientIdent);
+  m_conns.erase(clientIdent);
 
-  m_providers.ForEach([](std::shared_ptr<HALSimWSBaseProvider> provider) {
-    provider->OnNetworkDisconnected();
-  });
-
-  if (hws == m_hws.lock()) {
-    m_hws.reset();
-  }
+  m_providers.ForEach(
+      [clientIdent](std::shared_ptr<HALSimWSBaseProvider> provider) {
+        provider->OnNetworkDisconnected(clientIdent);
+      });
 }
 
 void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
