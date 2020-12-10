@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,7 +27,13 @@ class HttpParser {
   enum Type {
     kRequest = HTTP_REQUEST,
     kResponse = HTTP_RESPONSE,
-    kBoth = HTTP_BOTH
+    kBoth = HTTP_BOTH,
+    kRtspRequest = RTSP_REQUEST,
+    kRtspResponse = RTSP_RESPONSE,
+    kRtspBoth = RTSP_BOTH,
+    kHttpRtspRequest = HTTP_RTSP_REQUEST,
+    kHttpRtspResponse = HTTP_RTSP_RESPONSE,
+    kHttpRtspBoth = HTTP_RTSP_BOTH
   };
 
   /**
@@ -90,6 +96,13 @@ class HttpParser {
   }
 
   /**
+   * Get RTSP method.  Valid only on requests.
+   */
+  rtsp_method GetRtspMethod() const {
+    return static_cast<rtsp_method>(m_parser.method);
+  }
+
+  /**
    * Determine if an error occurred.
    * @return False if no error.
    */
@@ -116,6 +129,12 @@ class HttpParser {
    * @return True if upgrade header, false otherwise.
    */
   bool IsUpgrade() const { return m_parser.upgrade; }
+
+  /**
+   * Determine if the request was RTSP instead of HTTP.
+   * @return True if RTSP, false if HTTP.
+   */
+  bool IsRtsp() const { return m_parser.rtsp; }
 
   /**
    * If this returns false in the headersComplete or messageComplete
