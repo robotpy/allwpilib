@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -43,7 +43,7 @@ class SendableBuilderImpl : public SendableBuilder {
    * Get the network table.
    * @return The network table
    */
-  std::shared_ptr<nt::NetworkTable> GetTable();
+  std::shared_ptr<nt::NetworkTable> GetTable() override;
 
   /**
    * Return whether this sendable has an associated table.
@@ -202,7 +202,7 @@ class SendableBuilderImpl : public SendableBuilder {
 
   std::vector<Property> m_properties;
   std::function<void()> m_safeState;
-  std::function<void()> m_updateTable;
+  std::vector<std::function<void()>> m_updateTables;
   std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_controllableEntry;
   bool m_actuator = false;

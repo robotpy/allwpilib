@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,13 @@
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <units/units.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 #include <wpi/math>
 
 #pragma once
@@ -50,8 +56,6 @@ constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     (kWheelDiameterMeters * wpi::math::pi) / static_cast<double>(kEncoderCPR);
 
-constexpr bool kGyroReversed = false;
-
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
 // theoretically for *your* robot's drive. The RobotPy Characterization
@@ -83,8 +87,8 @@ constexpr double kPXController = 0.5;
 constexpr double kPYController = 0.5;
 constexpr double kPThetaController = 0.5;
 
-constexpr frc::TrapezoidProfile<units::radians>::Constraints
-    kThetaControllerConstraints{kMaxAngularSpeed, kMaxAngularAcceleration};
+extern const frc::TrapezoidProfile<units::radians>::Constraints
+    kThetaControllerConstraints;
 
 }  // namespace AutoConstants
 

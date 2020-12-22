@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 
+#include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
@@ -89,6 +90,8 @@ int StartRobot() {
     impl::RunRobot<Robot>(m, &robot);
   }
 
+  HAL_Shutdown();
+
   return 0;
 }
 
@@ -134,12 +137,28 @@ class RobotBase {
   bool IsAutonomous() const;
 
   /**
+   * Determine if the robot is currently in Autonomous mode and enabled.
+   *
+   * @return True if the robot us currently operating Autonomously while enabled
+   * as determined by the field controls.
+   */
+  bool IsAutonomousEnabled() const;
+
+  /**
    * Determine if the robot is currently in Operator Control mode.
    *
    * @return True if the robot is currently operating in Tele-Op mode as
    *         determined by the field controls.
    */
   bool IsOperatorControl() const;
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while
+   * wnabled as determined by the field-controls.
+   */
+  bool IsOperatorControlEnabled() const;
 
   /**
    * Determine if the robot is currently in Test mode.
@@ -166,6 +185,11 @@ class RobotBase {
 
   virtual void EndCompetition() = 0;
 
+  /**
+   * Get if the robot is real.
+   *
+   * @return If the robot is running in the real world.
+   */
   static constexpr bool IsReal() {
 #ifdef __FRC_ROBORIO__
     return true;
@@ -174,9 +198,13 @@ class RobotBase {
 #endif
   }
 
+  /**
+   * Get if the robot is a simulation.
+   *
+   * @return If the robot is running in simulation.
+   */
   static constexpr bool IsSimulation() { return !IsReal(); }
 
- protected:
   /**
    * Constructor for a generic robot program.
    *
@@ -192,6 +220,7 @@ class RobotBase {
 
   virtual ~RobotBase();
 
+ protected:
   // m_ds isn't moved in these because DriverStation is a singleton; every
   // instance of RobotBase has a reference to the same object.
   RobotBase(RobotBase&&) noexcept;

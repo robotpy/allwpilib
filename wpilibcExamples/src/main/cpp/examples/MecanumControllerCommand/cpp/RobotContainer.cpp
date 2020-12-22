@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,12 +21,6 @@
 #include "Constants.h"
 
 using namespace DriveConstants;
-
-const frc::MecanumDriveKinematics DriveConstants::kDriveKinematics{
-    frc::Translation2d(kWheelBase / 2, kTrackWidth / 2),
-    frc::Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-    frc::Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-    frc::Translation2d(-kWheelBase / 2, -kTrackWidth / 2)};
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -108,6 +102,9 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       },
 
       {&m_drive});
+
+  // Reset odometry to the starting pose of the trajectory.
+  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
 
   // no auto
   return new frc2::SequentialCommandGroup(

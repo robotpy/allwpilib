@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,233 +7,164 @@
 
 #include "SimDeviceGui.h"
 
+#include <glass/other/DeviceTree.h>
 #include <stdint.h>
 
-#include <vector>
-
 #include <hal/SimDevice.h>
-#include <imgui.h>
-#include <imgui_internal.h>
-#include <mockdata/SimDeviceData.h>
-#include <wpi/StringMap.h>
+#include <hal/simulation/SimDeviceData.h>
+#include <wpi/DenseMap.h>
 
+#include "HALDataSource.h"
 #include "HALSimGui.h"
 
 using namespace halsimgui;
 
 namespace {
-struct ElementInfo {
-  bool open = false;
-  bool visible = true;
+class SimValueSource : public glass::DataSource {
+ public:
+  explicit SimValueSource(HAL_SimValueHandle handle, const char* device,
+                          const char* name)
+      : DataSource(wpi::Twine{device} + wpi::Twine{'-'} + name),
+        m_callback{HALSIM_RegisterSimValueChangedCallback(
+            handle, this, CallbackFunc, true)} {}
+  ~SimValueSource() {
+    if (m_callback != 0) HALSIM_CancelSimValueChangedCallback(m_callback);
+  }
+
+ private:
+  static void CallbackFunc(const char*, void* param, HAL_SimValueHandle,
+                           HAL_Bool, const HAL_Value* value) {
+    auto source = static_cast<SimValueSource*>(param);
+    if (value->type == HAL_BOOLEAN) {
+      source->SetValue(value->data.v_boolean);
+      source->SetDigital(true);
+    } else if (value->type == HAL_DOUBLE) {
+      source->SetValue(value->data.v_double);
+      source->SetDigital(false);
+    }
+  }
+
+  int32_t m_callback;
+};
+
+class SimDevicesModel : public glass::Model {
+ public:
+  void Update() override;
+  bool Exists() override { return true; }
+
+  glass::DataSource* GetSource(HAL_SimValueHandle handle) {
+    return m_sources[handle].get();
+  }
+
+ private:
+  wpi::DenseMap<HAL_SimValueHandle, std::unique_ptr<SimValueSource>> m_sources;
 };
 }  // namespace
 
-static std::vector<std::function<void()>> gDeviceExecutors;
-static wpi::StringMap<ElementInfo> gElements;
+static SimDevicesModel* gSimDevicesModel;
 
-// read/write open state to ini file
-static void* DevicesReadOpen(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                             const char* name) {
-  return &gElements[name];
+void SimDevicesModel::Update() {
+  HALSIM_EnumerateSimDevices(
+      "", this, [](const char* name, void* self, HAL_SimDeviceHandle handle) {
+        struct Data {
+          SimDevicesModel* self;
+          const char* device;
+        } data = {static_cast<SimDevicesModel*>(self), name};
+        HALSIM_EnumerateSimValues(
+            handle, &data,
+            [](const char* name, void* dataV, HAL_SimValueHandle handle,
+               HAL_Bool readonly, const HAL_Value* value) {
+              auto data = static_cast<Data*>(dataV);
+              auto& source = data->self->m_sources[handle];
+              if (!source) {
+                source = std::make_unique<SimValueSource>(handle, data->device,
+                                                          name);
+              }
+            });
+      });
 }
 
-static void DevicesReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                            void* entry, const char* lineStr) {
-  ElementInfo* element = static_cast<ElementInfo*>(entry);
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
-  if (name == "open") {
-    int num;
-    if (value.getAsInteger(10, num)) return;
-    element->open = num;
-  }
-}
+static void DisplaySimValue(const char* name, void* data,
+                            HAL_SimValueHandle handle, HAL_Bool readonly,
+                            const HAL_Value* value) {
+  auto model = static_cast<SimDevicesModel*>(data);
 
-static void DevicesWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                            ImGuiTextBuffer* out_buf) {
-  for (auto&& entry : gElements) {
-    out_buf->appendf("[Device][%s]\nopen=%d\n\n", entry.getKey().data(),
-                     entry.getValue().open ? 1 : 0);
-  }
-}
+  HAL_Value valueCopy = *value;
 
-void SimDeviceGui::Hide(const char* name) { gElements[name].visible = false; }
-
-void SimDeviceGui::Add(std::function<void()> execute) {
-  if (execute) gDeviceExecutors.emplace_back(std::move(execute));
-}
-
-bool SimDeviceGui::StartDevice(const char* label, ImGuiTreeNodeFlags flags) {
-  auto& element = gElements[label];
-  if (!element.visible) return false;
-
-  if (ImGui::CollapsingHeader(
-          label, flags | (element.open ? ImGuiTreeNodeFlags_DefaultOpen : 0))) {
-    ImGui::PushID(label);
-    element.open = true;
-    return true;
-  }
-  element.open = false;
-  return false;
-}
-
-void SimDeviceGui::FinishDevice() { ImGui::PopID(); }
-
-bool DisplayValueImpl(const char* name, bool readonly, HAL_Value* value,
-                      const char** options, int32_t numOptions) {
-  // read-only
-  if (readonly) {
-    switch (value->type) {
-      case HAL_BOOLEAN:
-        ImGui::LabelText(name, "%s", value->data.v_boolean ? "true" : "false");
-        break;
-      case HAL_DOUBLE:
-        ImGui::LabelText(name, "%.6f", value->data.v_double);
-        break;
-      case HAL_ENUM: {
-        int current = value->data.v_enum;
-        if (current < 0 || current >= numOptions)
-          ImGui::LabelText(name, "%d (unknown)", current);
-        else
-          ImGui::LabelText(name, "%s", options[current]);
-        break;
-      }
-      case HAL_INT:
-        ImGui::LabelText(name, "%d", static_cast<int>(value->data.v_int));
-        break;
-      case HAL_LONG:
-        ImGui::LabelText(name, "%lld",
-                         static_cast<long long int>(  // NOLINT(runtime/int)
-                             value->data.v_long));
-        break;
-      default:
-        break;
-    }
-    return false;
-  }
-
-  // writable
   switch (value->type) {
     case HAL_BOOLEAN: {
-      static const char* boolOptions[] = {"false", "true"};
-      int val = value->data.v_boolean ? 1 : 0;
-      if (ImGui::Combo(name, &val, boolOptions, 2)) {
-        value->data.v_boolean = val;
-        return true;
+      bool v = value->data.v_boolean;
+      if (glass::DeviceBoolean(name, readonly, &v, model->GetSource(handle))) {
+        valueCopy.data.v_boolean = v ? 1 : 0;
+        HAL_SetSimValue(handle, valueCopy);
       }
       break;
     }
-    case HAL_DOUBLE: {
-      if (ImGui::InputDouble(name, &value->data.v_double, 0, 0, "%.6f",
-                             ImGuiInputTextFlags_EnterReturnsTrue))
-        return true;
+    case HAL_DOUBLE:
+      if (glass::DeviceDouble(name, readonly, &valueCopy.data.v_double,
+                              model->GetSource(handle))) {
+        HAL_SetSimValue(handle, valueCopy);
+      }
       break;
-    }
     case HAL_ENUM: {
-      int current = value->data.v_enum;
-      if (ImGui::Combo(name, &current, options, numOptions)) {
-        value->data.v_enum = current;
-        return true;
+      int32_t numOptions = 0;
+      const char** options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
+      if (glass::DeviceEnum(name, readonly, &valueCopy.data.v_enum, options,
+                            numOptions, model->GetSource(handle))) {
+        HAL_SetSimValue(handle, valueCopy);
       }
       break;
     }
-    case HAL_INT: {
-      if (ImGui::InputScalar(name, ImGuiDataType_S32, &value->data.v_int,
-                             nullptr, nullptr, nullptr,
-                             ImGuiInputTextFlags_EnterReturnsTrue))
-        return true;
+    case HAL_INT:
+      if (glass::DeviceInt(name, readonly, &valueCopy.data.v_int,
+                           model->GetSource(handle))) {
+        HAL_SetSimValue(handle, valueCopy);
+      }
       break;
-    }
-    case HAL_LONG: {
-      if (ImGui::InputScalar(name, ImGuiDataType_S64, &value->data.v_long,
-                             nullptr, nullptr, nullptr,
-                             ImGuiInputTextFlags_EnterReturnsTrue))
-        return true;
+    case HAL_LONG:
+      if (glass::DeviceLong(name, readonly, &valueCopy.data.v_long,
+                            model->GetSource(handle))) {
+        HAL_SetSimValue(handle, valueCopy);
+      }
       break;
-    }
     default:
       break;
   }
-  return false;
 }
 
-bool SimDeviceGui::DisplayValue(const char* name, bool readonly,
-                                HAL_Value* value, const char** options,
-                                int32_t numOptions) {
-  ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-  return DisplayValueImpl(name, readonly, value, options, numOptions);
-}
-
-static void SimDeviceDisplayValue(const char* name, void*,
-                                  HAL_SimValueHandle handle, HAL_Bool readonly,
-                                  const HAL_Value* value) {
-  int32_t numOptions = 0;
-  const char** options = nullptr;
-
-  if (value->type == HAL_ENUM)
-    options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
-
-  HAL_Value valueCopy = *value;
-  if (DisplayValueImpl(name, readonly, &valueCopy, options, numOptions))
-    HAL_SetSimValue(handle, valueCopy);
-}
-
-static void SimDeviceDisplayDevice(const char* name, void*,
-                                   HAL_SimDeviceHandle handle) {
-  auto it = gElements.find(name);
-  if (it != gElements.end() && !it->second.visible) return;
-
-  if (SimDeviceGui::StartDevice(name)) {
-    ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
-    HALSIM_EnumerateSimValues(handle, nullptr, SimDeviceDisplayValue);
-    ImGui::PopItemWidth();
-    SimDeviceGui::FinishDevice();
+static void DisplaySimDevice(const char* name, void* data,
+                             HAL_SimDeviceHandle handle) {
+  if (glass::BeginDevice(name)) {
+    HALSIM_EnumerateSimValues(handle, data, DisplaySimValue);
+    glass::EndDevice();
   }
-}
-
-static void DisplayDeviceTree() {
-  for (auto&& execute : gDeviceExecutors) {
-    if (execute) execute();
-  }
-  HALSIM_EnumerateSimDevices("", nullptr, SimDeviceDisplayDevice);
 }
 
 void SimDeviceGui::Initialize() {
-  // hook ini handler to save device settings
-  ImGuiSettingsHandler iniHandler;
-  iniHandler.TypeName = "Device";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  iniHandler.ReadOpenFn = DevicesReadOpen;
-  iniHandler.ReadLineFn = DevicesReadLine;
-  iniHandler.WriteAllFn = DevicesWriteAll;
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+  HALSimGui::halProvider.Register(
+      "Other Devices", [] { return true; },
+      [] { return std::make_unique<glass::DeviceTreeModel>(); },
+      [](glass::Window* win, glass::Model* model) {
+        win->SetDefaultPos(1025, 20);
+        win->SetDefaultSize(250, 695);
+        return glass::MakeFunctionView(
+            [=] { static_cast<glass::DeviceTreeModel*>(model)->Display(); });
+      });
 
-  HALSimGui::AddWindow("Other Devices", DisplayDeviceTree);
-  HALSimGui::SetDefaultWindowPos("Other Devices", 1025, 20);
-  HALSimGui::SetDefaultWindowSize("Other Devices", 250, 695);
+  auto model = std::make_unique<SimDevicesModel>();
+  gSimDevicesModel = model.get();
+  GetDeviceTree().Add(std::move(model), [](glass::Model* model) {
+    HALSIM_EnumerateSimDevices("", static_cast<SimDevicesModel*>(model),
+                               DisplaySimDevice);
+  });
 }
 
-extern "C" {
-
-void HALSIMGUI_DeviceTreeAdd(void* param, void (*execute)(void*)) {
-  if (execute) SimDeviceGui::Add([=] { execute(param); });
+glass::DataSource* SimDeviceGui::GetValueSource(HAL_SimValueHandle handle) {
+  return gSimDevicesModel->GetSource(handle);
 }
 
-void HALSIMGUI_DeviceTreeHide(const char* name) { SimDeviceGui::Hide(name); }
-
-HAL_Bool HALSIMGUI_DeviceTreeDisplayValue(const char* name, HAL_Bool readonly,
-                                          struct HAL_Value* value,
-                                          const char** options,
-                                          int32_t numOptions) {
-  return SimDeviceGui::DisplayValue(name, readonly, value, options, numOptions);
+glass::DeviceTreeModel& SimDeviceGui::GetDeviceTree() {
+  static auto model = HALSimGui::halProvider.GetModel("Other Devices");
+  assert(model);
+  return *static_cast<glass::DeviceTreeModel*>(model);
 }
-
-HAL_Bool HALSIMGUI_DeviceTreeStartDevice(const char* label, int32_t flags) {
-  return SimDeviceGui::StartDevice(label, flags);
-}
-
-void HALSIMGUI_DeviceTreeFinishDevice(void) { SimDeviceGui::FinishDevice(); }
-
-}  // extern "C"

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,8 +24,9 @@ class PIDSubsystem : public SubsystemBase {
    * Creates a new PIDSubsystem.
    *
    * @param controller the PIDController to use
+   * @param initialPosition the initial setpoint of the subsystem
    */
-  explicit PIDSubsystem(PIDController controller);
+  explicit PIDSubsystem(PIDController controller, double initialPosition = 0);
 
   void Periodic() override;
 
@@ -35,6 +36,13 @@ class PIDSubsystem : public SubsystemBase {
    * @param setpoint the setpoint for the subsystem
    */
   void SetSetpoint(double setpoint);
+
+  /**
+   * Gets the setpoint for the subsystem.
+   *
+   * @return the setpoint for the subsystem
+   */
+  double GetSetpoint() const;
 
   /**
    * Enables the PID control.  Resets the controller.
@@ -62,7 +70,7 @@ class PIDSubsystem : public SubsystemBase {
 
  protected:
   PIDController m_controller;
-  bool m_enabled;
+  bool m_enabled{false};
 
   /**
    * Returns the measurement of the process variable used by the PIDController.

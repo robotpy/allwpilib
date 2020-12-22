@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,8 @@
 
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <units/length.h>
+#include <wpi/math>
 
 DriveTrain::DriveTrain() {
 // Encoders may measure differently in the real world and in
@@ -20,11 +22,11 @@ DriveTrain::DriveTrain() {
   m_leftEncoder.SetDistancePerPulse(0.042);
   m_rightEncoder.SetDistancePerPulse(0.042);
 #else
-  // Circumference in ft = 4in/12(in/ft)*PI
-  m_leftEncoder.SetDistancePerPulse(static_cast<double>(4.0 / 12.0 * M_PI) /
-                                    360.0);
-  m_rightEncoder.SetDistancePerPulse(static_cast<double>(4.0 / 12.0 * M_PI) /
-                                     360.0);
+  // Circumference = diameter * pi. 360 tick simulated encoders.
+  m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+                                    wpi::math::pi / 360.0);
+  m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+                                     wpi::math::pi / 360.0);
 #endif
   SetName("DriveTrain");
   // Let's show everything on the LiveWindow
@@ -67,3 +69,5 @@ double DriveTrain::GetDistanceToObstacle() {
   // Really meters in simulation since it's a rangefinder...
   return m_rangefinder.GetAverageVoltage();
 }
+
+void DriveTrain::Periodic() { Log(); }

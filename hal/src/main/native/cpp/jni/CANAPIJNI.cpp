@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,7 +19,7 @@
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
 
-using namespace frc;
+using namespace hal;
 using namespace wpi::java;
 
 extern "C" {
@@ -105,6 +105,59 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANRTRFrame
   int32_t status = 0;
   HAL_WriteCANRTRFrame(halHandle, static_cast<int32_t>(length), apiId, &status);
   CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Method:    writeCANPacketNoThrow
+ * Signature: (I[BI)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketNoThrow
+  (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId)
+{
+  auto halHandle = static_cast<HAL_CANHandle>(handle);
+  JByteArrayRef arr{env, data};
+  auto arrRef = arr.array();
+  int32_t status = 0;
+  HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arrRef.data()),
+                     arrRef.size(), apiId, &status);
+  return status;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Method:    writeCANPacketRepeatingNoThrow
+ * Signature: (I[BII)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeatingNoThrow
+  (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId,
+   jint timeoutMs)
+{
+  auto halHandle = static_cast<HAL_CANHandle>(handle);
+  JByteArrayRef arr{env, data};
+  auto arrRef = arr.array();
+  int32_t status = 0;
+  HAL_WriteCANPacketRepeating(halHandle,
+                              reinterpret_cast<const uint8_t*>(arrRef.data()),
+                              arrRef.size(), apiId, timeoutMs, &status);
+  return status;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Method:    writeCANRTRFrameNoThrow
+ * Signature: (III)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANRTRFrameNoThrow
+  (JNIEnv* env, jclass, jint handle, jint length, jint apiId)
+{
+  auto halHandle = static_cast<HAL_CANHandle>(handle);
+  int32_t status = 0;
+  HAL_WriteCANRTRFrame(halHandle, static_cast<int32_t>(length), apiId, &status);
+  return status;
 }
 
 /*

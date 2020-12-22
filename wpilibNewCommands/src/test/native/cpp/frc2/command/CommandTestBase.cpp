@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,20 +18,12 @@ CommandTestBase::CommandTestBase() {
 
 CommandScheduler CommandTestBase::GetScheduler() { return CommandScheduler(); }
 
-void CommandTestBase::SetUp() {
-  HALSIM_SetDriverStationEnabled(true);
-  while (!HALSIM_GetDriverStationEnabled()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  }
-}
+void CommandTestBase::SetUp() { frc::sim::DriverStationSim::SetEnabled(true); }
 
 void CommandTestBase::TearDown() {
   CommandScheduler::GetInstance().ClearButtons();
 }
 
 void CommandTestBase::SetDSEnabled(bool enabled) {
-  HALSIM_SetDriverStationEnabled(enabled);
-  while (HALSIM_GetDriverStationEnabled() != static_cast<int>(enabled)) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  }
+  frc::sim::DriverStationSim::SetEnabled(enabled);
 }

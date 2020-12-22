@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,18 +7,29 @@
 
 #include "TimingGui.h"
 
+#include <glass/Model.h>
+#include <glass/View.h>
+
 #include <cstdio>
 #include <cstring>
 #include <vector>
 
 #include <hal/HALBase.h>
+#include <hal/simulation/MockHooks.h>
+#include <hal/simulation/NotifierData.h>
 #include <imgui.h>
-#include <mockdata/MockHooks.h>
-#include <mockdata/NotifierData.h>
 
 #include "HALSimGui.h"
 
 using namespace halsimgui;
+
+namespace {
+class TimingModel : public glass::Model {
+ public:
+  void Update() override {}
+  bool Exists() override { return true; }
+};
+}  // namespace
 
 static void DisplayTiming() {
   int32_t status = 0;
@@ -32,7 +43,8 @@ static void DisplayTiming() {
   if (ImGui::Button("Step")) {
     HALSIM_PauseTiming();
     uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
-    if (nextTimeout != UINT64_MAX) HALSIM_StepTiming(nextTimeout - curTime);
+    if (nextTimeout != UINT64_MAX)
+      HALSIM_StepTimingAsync(nextTimeout - curTime);
   }
   ImGui::PopButtonRepeat();
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
@@ -54,7 +66,14 @@ static void DisplayTiming() {
 }
 
 void TimingGui::Initialize() {
-  HALSimGui::AddWindow("Timing", DisplayTiming,
-                       ImGuiWindowFlags_AlwaysAutoResize);
-  HALSimGui::SetDefaultWindowPos("Timing", 5, 150);
+  HALSimGui::halProvider.Register(
+      "Timing", [] { return true; },
+      [] { return std::make_unique<TimingModel>(); },
+      [](glass::Window* win, glass::Model* model) {
+        win->DisableRenamePopup();
+        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+        win->SetDefaultPos(5, 150);
+        return glass::MakeFunctionView(DisplayTiming);
+      });
+  HALSimGui::halProvider.ShowDefault("Timing");
 }

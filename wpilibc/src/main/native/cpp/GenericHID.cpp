@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,6 @@
 #include "frc/GenericHID.h"
 
 #include <hal/DriverStation.h>
-#include <hal/FRCUsageReporting.h>
 
 #include "frc/DriverStation.h"
 #include "frc/WPIErrors.h"
@@ -46,6 +45,10 @@ int GenericHID::GetPOVCount() const { return m_ds->GetStickPOVCount(m_port); }
 
 int GenericHID::GetButtonCount() const {
   return m_ds->GetStickButtonCount(m_port);
+}
+
+bool GenericHID::IsConnected() const {
+  return m_ds->IsJoystickConnected(m_port);
 }
 
 GenericHID::HIDType GenericHID::GetType() const {

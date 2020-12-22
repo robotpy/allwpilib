@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,10 +25,21 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * Creates a new PIDSubsystem.
    *
    * @param controller the PIDController to use
+   * @param initialPosition the initial setpoint of the subsystem
+   */
+  public PIDSubsystem(PIDController controller, double initialPosition) {
+    setSetpoint(initialPosition);
+    m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
+    addChild("PID Controller", m_controller);
+  }
+
+  /**
+   * Creates a new PIDSubsystem.  Initial setpoint is zero.
+   *
+   * @param controller the PIDController to use
    */
   public PIDSubsystem(PIDController controller) {
-    requireNonNullParam(controller, "controller", "PIDSubsystem");
-    m_controller = controller;
+    this(controller, 0);
   }
 
   @Override
@@ -49,6 +60,15 @@ public abstract class PIDSubsystem extends SubsystemBase {
    */
   public void setSetpoint(double setpoint) {
     m_setpoint = setpoint;
+  }
+
+  /**
+   * Returns the current setpoint of the subsystem.
+   *
+   * @return The current setpoint
+   */
+  public double getSetpoint() {
+    return m_setpoint;
   }
 
   /**

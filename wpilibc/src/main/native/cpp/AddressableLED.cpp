@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -91,4 +91,8 @@ void AddressableLED::Stop() {
   int32_t status = 0;
   HAL_StopAddressableLEDOutput(m_handle, &status);
   wpi_setHALError(status);
+}
+
+void AddressableLED::LEDData::SetHSV(int h, int s, int v) {
+  SetLED(Color::FromHSV(h, s, v));
 }

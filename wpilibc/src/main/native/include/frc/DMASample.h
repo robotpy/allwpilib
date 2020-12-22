@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,11 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <hal/AnalogInput.h>
 #include <hal/DMA.h>
-#include <units/units.h>
+#include <units/time.h>
 
 #include "frc/AnalogInput.h"
 #include "frc/Counter.h"
@@ -104,5 +106,6 @@ class DMASample : public HAL_DMASample {
   }
 };
 
-static_assert(std::is_pod_v<frc::DMASample>, "DMA Sample MUST Be POD");
+static_assert(std::is_standard_layout_v<frc::DMASample>,
+              "frc::DMASample must have standard layout");
 }  // namespace frc

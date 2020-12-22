@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
 #include <wpi/ArrayRef.h>
@@ -217,6 +218,12 @@ class SendableBuilder {
       const wpi::Twine& key,
       std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
       std::function<void(wpi::StringRef)> setter) = 0;
+
+  /**
+   * Get the network table.
+   * @return The network table
+   */
+  virtual std::shared_ptr<nt::NetworkTable> GetTable() = 0;
 };
 
 }  // namespace frc

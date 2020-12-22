@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,6 +15,7 @@
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/AnalogInput.h"
+#include "frc/Base.h"
 #include "frc/Timer.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -159,4 +160,8 @@ void AnalogGyro::Calibrate() {
   int32_t status = 0;
   HAL_CalibrateAnalogGyro(m_gyroHandle, &status);
   wpi_setHALError(status);
+}
+
+std::shared_ptr<AnalogInput> AnalogGyro::GetAnalogInput() const {
+  return m_analog;
 }

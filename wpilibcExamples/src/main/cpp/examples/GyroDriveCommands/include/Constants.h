@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <units/angle.h>
+#include <units/angular_velocity.h>
 #include <wpi/math>
 
 /**
@@ -45,8 +47,11 @@ constexpr double kTurnP = 1;
 constexpr double kTurnI = 0;
 constexpr double kTurnD = 0;
 
-constexpr double kTurnToleranceDeg = 5;
-constexpr double kTurnRateToleranceDegPerS = 10;  // degrees per second
+constexpr auto kTurnTolerance = 5_deg;
+constexpr auto kTurnRateTolerance = 10_deg_per_s;
+
+constexpr auto kMaxTurnRate = 100_deg_per_s;
+constexpr auto kMaxTurnAcceleration = 300_deg_per_s / 1_s;
 }  // namespace DriveConstants
 
 namespace AutoConstants {

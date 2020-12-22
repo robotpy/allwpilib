@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,8 +22,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  * operator interface as a common use case of the more generalized Trigger objects. This is a simple
  * wrapper around Trigger with the method names renamed to fit the Button object use.
  */
-@SuppressWarnings("PMD.TooManyMethods")
-public abstract class Button extends Trigger {
+public class Button extends Trigger {
   /**
    * Default constructor; creates a button that is never pressed (unless {@link Button#get()} is
    * overridden).

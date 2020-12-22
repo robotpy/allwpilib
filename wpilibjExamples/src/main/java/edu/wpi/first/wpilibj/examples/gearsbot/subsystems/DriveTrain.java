@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -51,7 +51,7 @@ public class DriveTrain extends SubsystemBase {
       m_leftEncoder.setDistancePerPulse(0.042);
       m_rightEncoder.setDistancePerPulse(0.042);
     } else {
-      // Circumference in ft = 4in/12(in/ft)*PI
+      // Circumference = diameter in feet * pi. 360 tick simulated encoders.
       m_leftEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
       m_rightEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
     }
@@ -120,5 +120,13 @@ public class DriveTrain extends SubsystemBase {
   public double getDistanceToObstacle() {
     // Really meters in simulation since it's a rangefinder...
     return m_rangefinder.getAverageVoltage();
+  }
+
+  /**
+   * Call log method every loop.
+   */
+  @Override
+  public void periodic() {
+    log();
   }
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,8 +9,11 @@
 
 using namespace frc2;
 
-PIDSubsystem::PIDSubsystem(PIDController controller)
-    : m_controller{controller} {}
+PIDSubsystem::PIDSubsystem(PIDController controller, double initialPosition)
+    : m_controller{controller} {
+  SetSetpoint(initialPosition);
+  AddChild("PID Controller", &m_controller);
+}
 
 void PIDSubsystem::Periodic() {
   if (m_enabled) {
@@ -19,6 +22,8 @@ void PIDSubsystem::Periodic() {
 }
 
 void PIDSubsystem::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
+
+double PIDSubsystem::GetSetpoint() const { return m_setpoint; }
 
 void PIDSubsystem::Enable() {
   m_controller.Reset();

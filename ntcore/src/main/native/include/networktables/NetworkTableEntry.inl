@@ -1,12 +1,16 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017-2019. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_ENTRY_INL_
-#define NT_ENTRY_INL_
+#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_INL_
+#define NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_INL_
+
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace nt {
 
@@ -133,13 +137,28 @@ inline bool NetworkTableEntry::SetDefaultBooleanArray(
   return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
 }
 
+inline bool NetworkTableEntry::SetDefaultBooleanArray(
+    std::initializer_list<int> defaultValue) {
+  return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
+}
+
 inline bool NetworkTableEntry::SetDefaultDoubleArray(
     ArrayRef<double> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(defaultValue));
 }
 
+inline bool NetworkTableEntry::SetDefaultDoubleArray(
+    std::initializer_list<double> value) {
+  return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(value));
+}
+
 inline bool NetworkTableEntry::SetDefaultStringArray(
     ArrayRef<std::string> defaultValue) {
+  return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
+}
+
+inline bool NetworkTableEntry::SetDefaultStringArray(
+    std::initializer_list<std::string> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
 }
 
@@ -295,4 +314,4 @@ inline void NetworkTableEntry::RemoveListener(NT_EntryListener entry_listener) {
 
 }  // namespace nt
 
-#endif  // NT_ENTRY_INL_
+#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_INL_

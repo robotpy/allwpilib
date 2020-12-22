@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -56,6 +56,7 @@ Solenoid::~Solenoid() { HAL_FreeSolenoidPort(m_solenoidHandle); }
 
 void Solenoid::Set(bool on) {
   if (StatusIsFatal()) return;
+
   int32_t status = 0;
   HAL_SetSolenoid(m_solenoidHandle, on, &status);
   wpi_setHALError(status);
@@ -63,11 +64,15 @@ void Solenoid::Set(bool on) {
 
 bool Solenoid::Get() const {
   if (StatusIsFatal()) return false;
+
   int32_t status = 0;
   bool value = HAL_GetSolenoid(m_solenoidHandle, &status);
   wpi_setHALError(status);
+
   return value;
 }
+
+void Solenoid::Toggle() { Set(!Get()); }
 
 bool Solenoid::IsBlackListed() const {
   int value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);
@@ -93,6 +98,6 @@ void Solenoid::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Solenoid");
   builder.SetActuator(true);
   builder.SetSafeState([=]() { Set(false); });
-  builder.AddBooleanProperty("Value", [=]() { return Get(); },
-                             [=](bool value) { Set(value); });
+  builder.AddBooleanProperty(
+      "Value", [=]() { return Get(); }, [=](bool value) { Set(value); });
 }

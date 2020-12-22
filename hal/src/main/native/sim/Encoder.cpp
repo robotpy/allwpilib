@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,6 @@
 #include "CounterInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "hal/Counter.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
@@ -175,9 +174,9 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return;
   }
 
+  SimEncoderData[encoder->index].reset = true;
   SimEncoderData[encoder->index].count = 0;
   SimEncoderData[encoder->index].period = std::numeric_limits<double>::max();
-  SimEncoderData[encoder->index].reset = true;
 }
 double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);

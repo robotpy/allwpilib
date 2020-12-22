@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,116 +7,103 @@
 
 #include "AddressableLEDGui.h"
 
-#include <cstdio>
-#include <cstring>
-#include <vector>
+#include <glass/hardware/LEDDisplay.h>
 
 #include <hal/Ports.h>
+#include <hal/simulation/AddressableLEDData.h>
 #include <imgui.h>
-#include <imgui_internal.h>
-#include <mockdata/AddressableLEDData.h>
-#include <wpi/SmallVector.h>
 #include <wpi/StringRef.h>
 
-#include "ExtraGuiWidgets.h"
 #include "HALSimGui.h"
 
 using namespace halsimgui;
 
-static constexpr int kDefaultColumns = 10;
-static std::vector<int> numColumns;
+namespace {
+class AddressableLEDModel : public glass::LEDDisplayModel {
+ public:
+  explicit AddressableLEDModel(int32_t index) : m_index{index} {}
 
-// read/write columns setting to ini file
-static void* AddressableLEDReadOpen(ImGuiContext* ctx,
-                                    ImGuiSettingsHandler* handler,
-                                    const char* name) {
-  int num;
-  if (wpi::StringRef{name}.getAsInteger(10, num)) return nullptr;
-  if (num < 0) return nullptr;
-  if (num >= static_cast<int>(numColumns.size()))
-    numColumns.resize(num + 1, kDefaultColumns);
-  return &numColumns[num];
-}
-
-static void AddressableLEDReadLine(ImGuiContext* ctx,
-                                   ImGuiSettingsHandler* handler, void* entry,
-                                   const char* lineStr) {
-  int* cols = static_cast<int*>(entry);
-  // format: columns=#
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
-  if (name == "columns") {
-    int num;
-    if (value.getAsInteger(10, num)) return;
-    *cols = num;
+  void Update() override {}
+  bool Exists() override {
+    return HALSIM_GetAddressableLEDInitialized(m_index);
   }
-}
 
-static void AddressableLEDWriteAll(ImGuiContext* ctx,
-                                   ImGuiSettingsHandler* handler,
-                                   ImGuiTextBuffer* out_buf) {
-  for (size_t i = 0; i < numColumns.size(); ++i) {
-    out_buf->appendf("[AddressableLED][%d]\ncolumns=%d\n\n",
-                     static_cast<int>(i), numColumns[i]);
+  bool IsRunning() override { return HALSIM_GetAddressableLEDRunning(m_index); }
+
+  wpi::ArrayRef<Data> GetData(wpi::SmallVectorImpl<Data>&) override {
+    size_t length = HALSIM_GetAddressableLEDData(m_index, m_data);
+    return {reinterpret_cast<Data*>(m_data), length};
   }
-}
 
-static void DisplayAddressableLEDs() {
-  bool hasAny = false;
-  static const int numLED = HAL_GetNumAddressableLEDs();
-  if (numLED > static_cast<int>(numColumns.size()))
-    numColumns.resize(numLED, kDefaultColumns);
+ private:
+  int32_t m_index;
 
-  for (int i = 0; i < numLED; ++i) {
-    if (!HALSIM_GetAddressableLEDInitialized(i)) continue;
-    hasAny = true;
+  HAL_AddressableLEDData m_data[HAL_kAddressableLEDMaxLength];
+};
 
-    if (numLED > 1) ImGui::Text("LEDs[%d]", i);
+class AddressableLEDsModel : public glass::LEDDisplaysModel {
+ public:
+  AddressableLEDsModel() : m_models(HAL_GetNumAddressableLEDs()) {}
 
-    static HAL_AddressableLEDData data[HAL_kAddressableLEDMaxLength];
-    int length = HALSIM_GetAddressableLEDData(i, data);
-    bool running = HALSIM_GetAddressableLEDRunning(i);
+  void Update() override;
+  bool Exists() override;
 
-    ImGui::PushItemWidth(ImGui::GetFontSize() * 6);
-    ImGui::LabelText("Length", "%d", length);
-    ImGui::LabelText("Running", "%s", running ? "Yes" : "No");
-    ImGui::InputInt("Columns", &numColumns[i]);
-    if (numColumns[i] < 1) numColumns[i] = 1;
-    ImGui::PopItemWidth();
+  size_t GetNumLEDDisplays() override { return m_models.size(); }
 
-    // show as LED indicators
-    static int values[HAL_kAddressableLEDMaxLength];
-    static ImU32 colors[HAL_kAddressableLEDMaxLength];
+  void ForEachLEDDisplay(
+      wpi::function_ref<void(glass::LEDDisplayModel& model, int index)> func)
+      override;
 
-    if (!running) {
-      colors[0] = IM_COL32(128, 128, 128, 255);
-      for (int j = 0; j < length; ++j) values[j] = -1;
-    } else {
-      for (int j = 0; j < length; ++j) {
-        values[j] = j + 1;
-        colors[j] = IM_COL32(data[j].r, data[j].g, data[j].b, 255);
+ private:
+  std::vector<std::unique_ptr<AddressableLEDModel>> m_models;
+};
+}  // namespace
+
+void AddressableLEDsModel::Update() {
+  for (int i = 0; i < static_cast<int>(m_models.size()); ++i) {
+    auto& model = m_models[i];
+    if (HALSIM_GetAddressableLEDInitialized(i)) {
+      if (!model) {
+        model = std::make_unique<AddressableLEDModel>(i);
       }
+      if (model) model->Update();
+    } else {
+      model.reset();
     }
-
-    DrawLEDs(values, length, numColumns[i], colors);
   }
-  if (!hasAny) ImGui::Text("No addressable LEDs");
+}
+
+bool AddressableLEDsModel::Exists() {
+  for (auto&& model : m_models) {
+    if (model && model->Exists()) return true;
+  }
+  return false;
+}
+
+void AddressableLEDsModel::ForEachLEDDisplay(
+    wpi::function_ref<void(glass::LEDDisplayModel& model, int index)> func) {
+  for (int i = 0; i < static_cast<int>(m_models.size()); ++i) {
+    if (m_models[i]) func(*m_models[i], i);
+  }
+}
+
+static bool AddressableLEDsExists() {
+  static const int numLED = HAL_GetNumAddressableLEDs();
+  for (int i = 0; i < numLED; ++i) {
+    if (HALSIM_GetAddressableLEDInitialized(i)) return true;
+  }
+  return false;
 }
 
 void AddressableLEDGui::Initialize() {
-  // hook ini handler to save columns settings
-  ImGuiSettingsHandler iniHandler;
-  iniHandler.TypeName = "AddressableLED";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  iniHandler.ReadOpenFn = AddressableLEDReadOpen;
-  iniHandler.ReadLineFn = AddressableLEDReadLine;
-  iniHandler.WriteAllFn = AddressableLEDWriteAll;
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-
-  HALSimGui::AddWindow("Addressable LEDs", DisplayAddressableLEDs,
-                       ImGuiWindowFlags_AlwaysAutoResize);
-  HALSimGui::SetWindowVisibility("Addressable LEDs", HALSimGui::kHide);
-  HALSimGui::SetDefaultWindowPos("Addressable LEDs", 290, 100);
+  HALSimGui::halProvider.Register(
+      "Addressable LEDs", [] { return AddressableLEDsExists(); },
+      [] { return std::make_unique<AddressableLEDsModel>(); },
+      [](glass::Window* win, glass::Model* model) {
+        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+        win->SetDefaultPos(290, 100);
+        return glass::MakeFunctionView([=] {
+          glass::DisplayLEDDisplays(static_cast<AddressableLEDsModel*>(model));
+        });
+      });
 }

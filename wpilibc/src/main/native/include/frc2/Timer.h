@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,11 +7,8 @@
 
 #pragma once
 
-#include <units/units.h>
-#include <wpi/deprecated.h>
+#include <units/time.h>
 #include <wpi/mutex.h>
-
-#include "frc/Base.h"
 
 namespace frc2 {
 
@@ -75,7 +72,8 @@ class Timer {
    * Start the timer running.
    *
    * Just set the running flag to true indicating that all time requests should
-   * be relative to the system clock.
+   * be relative to the system clock. Note that this method is a no-op if the
+   * timer is already running.
    */
   void Start();
 
@@ -89,6 +87,14 @@ class Timer {
   void Stop();
 
   /**
+   * Check if the period specified has passed.
+   *
+   * @param seconds The period to check.
+   * @return        True if the period has passed.
+   */
+  bool HasElapsed(units::second_t period) const;
+
+  /**
    * Check if the period specified has passed and if it has, advance the start
    * time by that period. This is useful to decide if it's time to do periodic
    * work without drifting later by the time it took to get around to checking.
@@ -97,6 +103,16 @@ class Timer {
    * @return       True if the period has passed.
    */
   bool HasPeriodPassed(units::second_t period);
+
+  /**
+   * Check if the period specified has passed and if it has, advance the start
+   * time by that period. This is useful to decide if it's time to do periodic
+   * work without drifting later by the time it took to get around to checking.
+   *
+   * @param period The period to check for.
+   * @return       True if the period has passed.
+   */
+  bool AdvanceIfElapsed(units::second_t period);
 
   /**
    * Return the FPGA system clock time in seconds.
@@ -124,9 +140,6 @@ class Timer {
    * @return Time remaining in current match period (auto or teleop)
    */
   static units::second_t GetMatchTime();
-
-  // The time, in seconds, at which the 32-bit FPGA timestamp rolls over to 0
-  static const units::second_t kRolloverTime;
 
  private:
   units::second_t m_startTime = 0_s;

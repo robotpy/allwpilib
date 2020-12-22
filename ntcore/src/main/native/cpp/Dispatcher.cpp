@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@
 
 #include <wpi/TCPAcceptor.h>
 #include <wpi/TCPConnector.h>
+#include <wpi/timestamp.h>
 
 #include "IConnectionNotifier.h"
 #include "IStorage.h"
@@ -115,6 +116,16 @@ DispatcherBase::~DispatcherBase() { Stop(); }
 
 unsigned int DispatcherBase::GetNetworkMode() const { return m_networkMode; }
 
+void DispatcherBase::StartLocal() {
+  {
+    std::scoped_lock lock(m_user_mutex);
+    if (m_active) return;
+    m_active = true;
+  }
+  m_networkMode = NT_NET_MODE_LOCAL;
+  m_storage.SetDispatcher(this, false);
+}
+
 void DispatcherBase::StartServer(
     const Twine& persist_filename,
     std::unique_ptr<wpi::NetworkAcceptor> acceptor) {
@@ -193,9 +204,9 @@ void DispatcherBase::Stop() {
 }
 
 void DispatcherBase::SetUpdateRate(double interval) {
-  // don't allow update rates faster than 10 ms or slower than 1 second
-  if (interval < 0.01)
-    interval = 0.01;
+  // don't allow update rates faster than 5 ms or slower than 1 second
+  if (interval < 0.005)
+    interval = 0.005;
   else if (interval > 1.0)
     interval = 1.0;
   m_update_rate = static_cast<unsigned int>(interval * 1000);
@@ -207,11 +218,11 @@ void DispatcherBase::SetIdentity(const Twine& name) {
 }
 
 void DispatcherBase::Flush() {
-  auto now = std::chrono::steady_clock::now();
+  auto now = wpi::Now();
   {
     std::scoped_lock lock(m_flush_mutex);
-    // don't allow flushes more often than every 10 ms
-    if ((now - m_last_flush) < std::chrono::milliseconds(10)) return;
+    // don't allow flushes more often than every 5 ms
+    if ((now - m_last_flush) < 5000) return;
     m_last_flush = now;
     m_do_flush = true;
   }
@@ -233,6 +244,8 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
 
 bool DispatcherBase::IsConnected() const {
   if (!m_active) return false;
+
+  if (m_networkMode == NT_NET_MODE_LOCAL) return true;
 
   std::scoped_lock lock(m_user_mutex);
   for (auto& conn : m_connections) {

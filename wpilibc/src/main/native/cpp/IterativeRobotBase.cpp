@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,16 +7,13 @@
 
 #include "frc/IterativeRobotBase.h"
 
-#include <cstdio>
-
 #include <hal/DriverStation.h>
-#include <hal/FRCUsageReporting.h>
+#include <networktables/NetworkTableInstance.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
-#include "frc/Timer.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/smartdashboard/SmartDashboard.h"
@@ -31,6 +28,10 @@ IterativeRobotBase::IterativeRobotBase(units::second_t period)
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+}
+
+void IterativeRobotBase::SimulationInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
@@ -51,6 +52,14 @@ void IterativeRobotBase::TestInit() {
 }
 
 void IterativeRobotBase::RobotPeriodic() {
+  static bool firstRun = true;
+  if (firstRun) {
+    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    firstRun = false;
+  }
+}
+
+void IterativeRobotBase::SimulationPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
@@ -88,6 +97,10 @@ void IterativeRobotBase::TestPeriodic() {
     wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
     firstRun = false;
   }
+}
+
+void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
+  m_ntFlushEnabled = enabled;
 }
 
 void IterativeRobotBase::LoopFunc() {
@@ -161,7 +174,18 @@ void IterativeRobotBase::LoopFunc() {
   m_watchdog.AddEpoch("LiveWindow::UpdateValues()");
   Shuffleboard::Update();
   m_watchdog.AddEpoch("Shuffleboard::Update()");
+
+  if constexpr (IsSimulation()) {
+    HAL_SimPeriodicBefore();
+    SimulationPeriodic();
+    HAL_SimPeriodicAfter();
+    m_watchdog.AddEpoch("SimulationPeriodic()");
+  }
+
   m_watchdog.Disable();
+
+  // Flush NetworkTables
+  if (m_ntFlushEnabled) nt::NetworkTableInstance::GetDefault().Flush();
 
   // Warn on loop time overruns
   if (m_watchdog.IsExpired()) {

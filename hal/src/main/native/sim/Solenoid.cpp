@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,7 +12,7 @@
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
-#include "mockdata/PCMDataInternal.h"
+#include "hal/simulation/PCMData.h"
 
 namespace {
 struct Solenoid {
@@ -75,6 +75,7 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
   solenoidPort->channel = static_cast<uint8_t>(channel);
 
   HALSIM_SetPCMSolenoidInitialized(module, channel, true);
+  HALSIM_SetPCMAnySolenoidInitialized(module, true);
 
   return handle;
 }
@@ -83,6 +84,15 @@ void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoidPortHandle) {
   if (port == nullptr) return;
   solenoidHandles->Free(solenoidPortHandle);
   HALSIM_SetPCMSolenoidInitialized(port->module, port->channel, false);
+  int count = 0;
+  for (int i = 0; i < kNumSolenoidChannels; ++i) {
+    if (HALSIM_GetPCMSolenoidInitialized(port->module, i)) {
+      ++count;
+    }
+  }
+  if (count == 0) {
+    HALSIM_SetPCMAnySolenoidInitialized(port->module, false);
+  }
 }
 HAL_Bool HAL_CheckSolenoidModule(int32_t module) {
   return module < kNumPCMModules && module >= 0;

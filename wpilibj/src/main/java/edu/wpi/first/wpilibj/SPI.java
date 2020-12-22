@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,7 +19,7 @@ import edu.wpi.first.hal.SPIJNI;
 /**
  * Represents a SPI bus port.
  */
-@SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.TooManyMethods"})
+@SuppressWarnings("PMD.CyclomaticComplexity")
 public class SPI implements AutoCloseable {
   public enum Port {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
@@ -162,9 +162,9 @@ public class SPI implements AutoCloseable {
   }
 
   /**
-   * Write data to the slave device. Blocks until there is space in the output FIFO.
+   * Write data to the peripheral device. Blocks until there is space in the output FIFO.
    *
-   * <p>If not running in output only mode, also saves the data received on the MISO input during
+   * <p>If not running in output only mode, also saves the data received on the CIPO input during
    * the transfer into the receive FIFO.
    */
   public int write(byte[] dataToSend, int size) {
@@ -175,9 +175,9 @@ public class SPI implements AutoCloseable {
   }
 
   /**
-   * Write data to the slave device. Blocks until there is space in the output FIFO.
+   * Write data to the peripheral device. Blocks until there is space in the output FIFO.
    *
-   * <p>If not running in output only mode, also saves the data received on the MISO input during
+   * <p>If not running in output only mode, also saves the data received on the CIPO input during
    * the transfer into the receive FIFO.
    *
    * @param dataToSend The buffer containing the data to send.
@@ -422,6 +422,17 @@ public class SPI implements AutoCloseable {
    */
   public int getAutoDroppedCount() {
     return SPIJNI.spiGetAutoDroppedCount(m_port);
+  }
+
+  /**
+   * Configure the Auto SPI Stall time between reads.
+   *
+   * @param csToSclkTicks the number of ticks to wait before asserting the cs pin
+   * @param stallTicks the number of ticks to stall for
+   * @param pow2BytesPerRead the number of bytes to read before stalling
+   */
+  public void configureAutoStall(int csToSclkTicks, int stallTicks, int pow2BytesPerRead) {
+    SPIJNI.spiConfigureAutoStall(m_port, csToSclkTicks, stallTicks, pow2BytesPerRead);
   }
 
   private static final int kAccumulateDepth = 2048;

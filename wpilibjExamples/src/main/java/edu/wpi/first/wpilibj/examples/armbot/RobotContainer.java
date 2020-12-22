@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.armbot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.armbot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj.examples.armbot.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.OIConstants.kDriverControllerPort;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -32,7 +32,7 @@ public class RobotContainer {
   private final ArmSubsystem m_robotArm = new ArmSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -62,11 +62,21 @@ public class RobotContainer {
 
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
     new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(() -> m_robotArm.setGoal(2), m_robotArm);
+        .whenPressed(() -> {
+          m_robotArm.setGoal(2);
+          m_robotArm.enable();
+        }, m_robotArm);
 
     // Move the arm to neutral position when the 'B' button is pressed.
     new JoystickButton(m_driverController, Button.kB.value)
-        .whenPressed(() -> m_robotArm.setGoal(Constants.ArmConstants.kArmOffsetRads), m_robotArm);
+        .whenPressed(() -> {
+          m_robotArm.setGoal(Constants.ArmConstants.kArmOffsetRads);
+          m_robotArm.enable();
+        }, m_robotArm);
+
+    // Disable the arm controller when Y is pressed.
+    new JoystickButton(m_driverController, Button.kY.value)
+        .whenPressed(m_robotArm::disable);
 
     // Drive at half speed when the bumper is held
     new JoystickButton(m_driverController, Button.kBumperRight.value)
@@ -74,6 +84,13 @@ public class RobotContainer {
         .whenReleased(() -> m_robotDrive.setMaxOutput(1));
   }
 
+  /**
+   * Disables all ProfiledPIDSubsystem and PIDSubsystem instances. This
+   * should be called on robot disable to prevent integral windup.
+   */
+  public void disablePIDSubsystems() {
+    m_robotArm.disable();
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

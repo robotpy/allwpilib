@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -53,8 +53,8 @@ public class RamseteCommand extends CommandBase {
 
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the provided trajectory.
-   * PID control and feedforward are handled internally, and outputs are scaled -1 to 1 for easy
-   * consumption by speed controllers.
+   * PID control and feedforward are handled internally, and outputs are scaled -12 to 12
+   * representing units of volts.
    *
    * <p>Note: The controller will *not* set the outputVolts to zero upon completion of the path -
    * this
@@ -138,7 +138,7 @@ public class RamseteCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    m_prevTime = 0;
+    m_prevTime = -1;
     var initialState = m_trajectory.sample(0);
     m_prevSpeeds = m_kinematics.toWheelSpeeds(
         new ChassisSpeeds(initialState.velocityMetersPerSecond,
@@ -157,6 +157,12 @@ public class RamseteCommand extends CommandBase {
   public void execute() {
     double curTime = m_timer.get();
     double dt = curTime - m_prevTime;
+
+    if (m_prevTime < 0) {
+      m_output.accept(0.0, 0.0);
+      m_prevTime = curTime;
+      return;
+    }
 
     var targetWheelSpeeds = m_kinematics.toWheelSpeeds(
         m_follower.calculate(m_pose.get(), m_trajectory.sample(curTime)));
@@ -189,9 +195,8 @@ public class RamseteCommand extends CommandBase {
     }
 
     m_output.accept(leftOutput, rightOutput);
-
-    m_prevTime = curTime;
     m_prevSpeeds = targetWheelSpeeds;
+    m_prevTime = curTime;
   }
 
   @Override
@@ -201,6 +206,6 @@ public class RamseteCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_timer.hasPeriodPassed(m_trajectory.getTotalTimeSeconds());
+    return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
   }
 }

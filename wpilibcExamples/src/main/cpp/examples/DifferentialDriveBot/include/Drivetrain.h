@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,9 +12,13 @@
 #include <frc/PWMVictorSPX.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/controller/PIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
+#include <units/velocity.h>
 #include <wpi/math>
 
 /**
@@ -31,14 +35,9 @@ class Drivetrain {
                                       kEncoderResolution);
     m_rightEncoder.SetDistancePerPulse(2 * wpi::math::pi * kWheelRadius /
                                        kEncoderResolution);
-  }
 
-  /**
-   * Get the robot angle as a Rotation2d.
-   */
-  frc::Rotation2d GetAngle() const {
-    // Negating the angle because WPILib Gyros are CW positive.
-    return frc::Rotation2d(units::degree_t(-m_gyro.GetAngle()));
+    m_leftEncoder.Reset();
+    m_rightEncoder.Reset();
   }
 
   static constexpr units::meters_per_second_t kMaxSpeed =
@@ -46,7 +45,6 @@ class Drivetrain {
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
       wpi::math::pi};  // 1/2 rotation per second
 
-  frc::DifferentialDriveWheelSpeeds GetSpeeds() const;
   void SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds);
   void Drive(units::meters_per_second_t xSpeed,
              units::radians_per_second_t rot);
@@ -57,13 +55,13 @@ class Drivetrain {
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
-  frc::PWMVictorSPX m_leftMaster{1};
+  frc::PWMVictorSPX m_leftLeader{1};
   frc::PWMVictorSPX m_leftFollower{2};
-  frc::PWMVictorSPX m_rightMaster{3};
+  frc::PWMVictorSPX m_rightLeader{3};
   frc::PWMVictorSPX m_rightFollower{4};
 
-  frc::SpeedControllerGroup m_leftGroup{m_leftMaster, m_leftFollower};
-  frc::SpeedControllerGroup m_rightGroup{m_rightMaster, m_rightFollower};
+  frc::SpeedControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
+  frc::SpeedControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
 
   frc::Encoder m_leftEncoder{0, 1};
   frc::Encoder m_rightEncoder{2, 3};
@@ -74,5 +72,9 @@ class Drivetrain {
   frc::AnalogGyro m_gyro{0};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
-  frc::DifferentialDriveOdometry m_odometry{m_kinematics, GetAngle()};
+  frc::DifferentialDriveOdometry m_odometry{m_gyro.GetRotation2d()};
+
+  // Gains are for example purposes only - must be determined for your own
+  // robot!
+  frc::SimpleMotorFeedforward<units::meters> m_feedforward{1_V, 3_V / 1_mps};
 };

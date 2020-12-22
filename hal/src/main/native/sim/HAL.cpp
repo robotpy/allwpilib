@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,8 +7,16 @@
 
 #include "hal/HAL.h"
 
+#include <vector>
+
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/spinlock.h>
+
+#ifdef _WIN32
+#include <Windows.h>
+#pragma comment(lib, "Winmm.lib")
+#endif  // _WIN32
 
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
@@ -17,9 +25,39 @@
 #include "hal/Errors.h"
 #include "hal/Extensions.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/simulation/DriverStationData.h"
+#include "hal/simulation/SimCallbackRegistry.h"
 #include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;
+
+namespace {
+class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
+ public:
+  int32_t Register(HALSIM_SimPeriodicCallback callback, void* param) {
+    std::scoped_lock lock(m_mutex);
+    return DoRegister(reinterpret_cast<RawFunctor>(callback), param);
+  }
+
+  void operator()() const {
+#ifdef _MSC_VER  // work around VS2019 16.4.0 bug
+    std::scoped_lock<wpi::recursive_spinlock> lock(m_mutex);
+#else
+    std::scoped_lock lock(m_mutex);
+#endif
+    if (m_callbacks) {
+      for (auto&& cb : *m_callbacks)
+        reinterpret_cast<HALSIM_SimPeriodicCallback>(cb.callback)(cb.param);
+    }
+  }
+};
+}  // namespace
+
+static HAL_RuntimeType runtimeType{HAL_Mock};
+static wpi::spinlock gOnShutdownMutex;
+static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
+static SimPeriodicCallbackRegistry gSimPeriodicBefore;
+static SimPeriodicCallbackRegistry gSimPeriodicAfter;
 
 namespace hal {
 namespace init {
@@ -53,6 +91,7 @@ void InitializeHAL() {
   InitializeAnalogInput();
   InitializeAnalogInternal();
   InitializeAnalogOutput();
+  InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCompressor();
   InitializeConstants();
@@ -214,7 +253,9 @@ const char* HAL_GetErrorMessage(int32_t code) {
   }
 }
 
-HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Mock; }
+HAL_RuntimeType HAL_GetRuntimeType(void) { return runtimeType; }
+
+void HALSIM_SetRuntimeType(HAL_RuntimeType type) { runtimeType = type; }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
   return 2018;  // Automatically script this at some point
@@ -253,7 +294,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
-  return true;  // Figure out if we need to handle this
+  return HALSIM_GetDriverStationEnabled();
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
@@ -274,13 +315,69 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   hal::init::HAL_IsInitialized.store(true);
 
-  wpi::outs().SetUnbuffered();
-  if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
 
   initialized = true;
+
+// Set Timer Precision to 1ms on Windows
+#ifdef _WIN32
+  TIMECAPS tc;
+  if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+    UINT target = min(1, tc.wPeriodMin);
+    timeBeginPeriod(target);
+    std::atexit([]() {
+      TIMECAPS tc;
+      if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+        UINT target = min(1, tc.wPeriodMin);
+        timeEndPeriod(target);
+      }
+    });
+  }
+#endif  // _WIN32
+
+  wpi::outs().SetUnbuffered();
+  if (HAL_LoadExtensions() < 0) return false;
+
   return true;  // Add initialization if we need to at a later point
+}
+
+void HAL_Shutdown(void) {
+  std::vector<std::pair<void*, void (*)(void*)>> funcs;
+  {
+    std::scoped_lock lock(gOnShutdownMutex);
+    funcs.swap(gOnShutdown);
+  }
+  for (auto&& func : funcs) {
+    func.second(func.first);
+  }
+}
+
+void HAL_OnShutdown(void* param, void (*func)(void*)) {
+  std::scoped_lock lock(gOnShutdownMutex);
+  gOnShutdown.emplace_back(param, func);
+}
+
+void HAL_SimPeriodicBefore(void) { gSimPeriodicBefore(); }
+
+void HAL_SimPeriodicAfter(void) { gSimPeriodicAfter(); }
+
+int32_t HALSIM_RegisterSimPeriodicBeforeCallback(
+    HALSIM_SimPeriodicCallback callback, void* param) {
+  return gSimPeriodicBefore.Register(callback, param);
+}
+
+void HALSIM_CancelSimPeriodicBeforeCallback(int32_t uid) {
+  gSimPeriodicBefore.Cancel(uid);
+}
+
+int32_t HALSIM_RegisterSimPeriodicAfterCallback(
+    HALSIM_SimPeriodicCallback callback, void* param) {
+  return gSimPeriodicAfter.Register(callback, param);
+}
+
+void HALSIM_CancelSimPeriodicAfterCallback(int32_t uid) {
+  gSimPeriodicAfter.Cancel(uid);
 }
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
