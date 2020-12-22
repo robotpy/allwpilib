@@ -2,6 +2,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'java-library'
 //apply plugin: 'net.ltgt.errorprone'
 apply plugin: 'jacoco'
+apply plugin: 'com.github.spotbugs'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
@@ -126,5 +127,30 @@ jacocoTestReport {
     reports {
         xml.enabled true
         html.enabled true
+    }
+}
+
+spotbugs {
+    toolVersion = '3.1.12'
+    ignoreFailures = false
+    effort = 'max'
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    reports {
+        xml.enabled = false
+        emacs.enabled = true
+    }
+    finalizedBy task("${name}Report") {
+        doLast {
+            def reportFile = reports.emacs.destination
+
+            if (reportFile.exists()) {
+                def report = reportFile.text
+                if (!report.isEmpty()) {
+                    logger.warn(report)
+                }
+            }
+        }
     }
 }
