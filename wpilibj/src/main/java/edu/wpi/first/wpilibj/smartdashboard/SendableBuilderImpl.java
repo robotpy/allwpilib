@@ -240,7 +240,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isBoolean()) {
           SmartDashboard.postListenerTask(() -> setter.accept(event.value.getBoolean()));
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -263,7 +266,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isDouble()) {
           SmartDashboard.postListenerTask(() -> setter.accept(event.value.getDouble()));
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -286,7 +292,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isString()) {
           SmartDashboard.postListenerTask(() -> setter.accept(event.value.getString()));
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -310,7 +319,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isBooleanArray()) {
           SmartDashboard.postListenerTask(() -> setter.accept(event.value.getBooleanArray()));
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -334,7 +346,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isDoubleArray()) {
           SmartDashboard.postListenerTask(() -> setter.accept(event.value.getDoubleArray()));
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -358,7 +373,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isStringArray()) {
           SmartDashboard.postListenerTask(() -> setter.accept(event.value.getStringArray()));
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -381,7 +399,10 @@ public class SendableBuilderImpl implements SendableBuilder {
         if (event.value.isRaw()) {
           SmartDashboard.postListenerTask(() -> setter.accept(event.value.getRaw()));
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }
@@ -402,8 +423,11 @@ public class SendableBuilderImpl implements SendableBuilder {
     }
     if (setter != null) {
       property.m_createListener = entry -> entry.addListener(event -> {
-        SmartDashboard.postListenerTask(() -> setter.accept(event.value));
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+        setter.accept(event.value);
+      }, EntryListenerFlags.kImmediate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate);
     }
     m_properties.add(property);
   }

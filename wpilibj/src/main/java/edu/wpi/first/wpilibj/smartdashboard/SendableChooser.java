@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,11 +8,14 @@
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiConsumer;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
@@ -58,6 +61,8 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   private final Map<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
   private final int m_instance;
+  private final List<BiConsumer<String, V>> m_selectionListeners
+      = Collections.synchronizedList(new ArrayList<>());
   private static final AtomicInteger s_instances = new AtomicInteger();
 
   /**
@@ -144,6 +149,37 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
     }
   }
 
+  /**
+   * Adds a listener to be called when the selected option is changed.
+   *
+   * @param listener The listener to be called with the new value
+   * @throws NullPointerException if listener is null.
+   */
+  public void addSelectionListener(final BiConsumer<String, V> listener) {
+    Objects.requireNonNull(listener);
+
+    m_selectionListeners.add(listener);
+  }
+
+  /**
+   * Removes a listener to be called when the selected option is changed.
+   *
+   * @param listener The listener to remove
+   * @return true if the remove was successful
+   */
+  public boolean removeSelectionListener(final BiConsumer<String, V> listener) {
+    return m_selectionListeners.remove(listener);
+  }
+
+  /**
+   * Removes all the selection listeners.
+   *
+   * @see #removeSelectionListener(BiConsumer)
+   */
+  public void removeAllSelectionListeners() {
+    m_selectionListeners.clear();
+  }
+
   private String m_selected;
   private final List<NetworkTableEntry> m_activeEntries = new ArrayList<>();
   private final ReentrantLock m_mutex = new ReentrantLock();
@@ -176,6 +212,12 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
       m_mutex.lock();
       try {
         m_selected = val;
+        synchronized (m_selectionListeners) {
+          V selectionValue = getSelected();
+          for (BiConsumer<String, V> listener : m_selectionListeners) {
+            listener.accept(m_selected, selectionValue);
+          }
+        }
         for (NetworkTableEntry entry : m_activeEntries) {
           entry.setString(val);
         }
