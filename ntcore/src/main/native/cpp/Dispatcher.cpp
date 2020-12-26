@@ -395,6 +395,26 @@ void DispatcherBase::ServerThreadMain() {
     DEBUG0("server: client connection from " << stream->getPeerIP() << " port "
                                              << stream->getPeerPort());
 
+    char peekBuffer[3];
+    wpi::NetworkStream::Error err;
+    size_t read = stream->peek(peekBuffer, 3, &err);
+
+    if (read == 3 && std::memcmp(peekBuffer, "GET", 3) == 0) {
+      DEBUG0("server: rejecting client from "
+             << stream->getPeerIP() << " port " << stream->getPeerPort()
+             << ". Attempted to connect over websockets.");
+      // Reject websocket connection with non 101 HTTP Response.
+      constexpr auto kResponse =
+          "HTTP/1.1 400 Bad Request\r\n"
+          "Connection:close\r\n"
+          "Content-Type: text/plain\r\n"
+          "\r\n"
+          "Server is unable to serve websocket clients. NT4 server may be "
+          "available on port 5810.";
+      stream->send(kResponse, std::strlen(kResponse), &err);
+      continue;
+    }
+
     // add to connections list
     using namespace std::placeholders;
     auto conn = std::make_shared<NetworkConnection>(
