@@ -154,7 +154,7 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 |===
 
 [[meta-client-sub]]
-==== Client Subscriptions (`$clientsub$<topic>`)
+==== Client Subscriptions (`$clientsub$<client>`)
 
 The server shall update this topic when the corresponding client subscribes or unsubscribes to any topic.
 
