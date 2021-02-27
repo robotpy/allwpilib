@@ -45,6 +45,11 @@ Consistent with pub/sub nomenclature, this spec uses the term "topic" for what w
 
 MessagePack messages use numeric IDs for topics to reduce data size; these IDs have a 1:1 mapping to a full topic name (a string).  This mapping is communicated via the JSON <<msg-announce>>.
 
+[[topic-names]]
+=== Topic Names
+
+Topic have UTF-8 string names.  Names starting with $ are reserved for use by the server (see <<meta-topics>>).  Otherwise names are unrestricted, but convention is for them to start with `/` and be `/`-separated (without consecutive `//`) to make a Unix-path-like structure.
+
 [[timestamps]]
 === Timestamps
 
