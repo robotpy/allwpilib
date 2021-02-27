@@ -115,6 +115,99 @@ Clients are responsible for keeping server connections established (e.g. via ret
 
 Except for offline-published values with timestamps of 0 and 1, the client shall not send any other published values to the server until its clock is synchronized with the server per the <<timestamps>> section.
 
+[[meta-topics]]
+=== Server-Published Meta Topics
+
+The server shall publish a standard set of topics with information about server state.  Clients may subscribe to these topics for diagnostics purposes.  These topics are hidden--they are only announced to clients that have subscribed to them.
+
+[cols="1,1,2", options="header"]
+|===
+|Topic Name|Data Type|Description
+|<<meta-clients,`$clients`>>|`msgpack`|Connected clients
+|<<meta-client-sub,`$clientsub$<client>`>>|`msgpack`|Client `<client>` subscriptions
+|<<meta-sub,`$sub$<topic>`>>|`msgpack`|Subscriptions to `<topic>`
+|===
+
+[[meta-clients]]
+==== Connected Clients (`$clients`)
+
+The server shall update this topic when a client connects or disconnects.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,1,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`id`
+|String
+|Client name
+|
+
+|`conn`
+|String
+|Connection info
+|Connection information about the client; typically host:port
+|===
+
+[[meta-client-sub]]
+==== Client Subscriptions (`$clientsub$<topic>`)
+
+The server shall update this topic when the corresponding client subscribes or unsubscribes to any topic.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`uid`
+|Integer
+|Subscription UID
+|A client-generated unique identifier for this subscription.
+
+|`prefixes`
+|Array of String
+|Array of topic prefixes
+|One or more topic prefixes to start receiving messages for.
+
+|`options`
+|Object
+|Options
+|Subscription options, see `subscribe`
+|===
+
+[[meta-sub]]
+==== Subscriptions (`$sub$<topic>`)
+
+The server shall update this topic when a client subscribes or unsubscribes to `<topic>`.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`client`
+|String
+|Client name
+|
+
+|`subuid`
+|Integer
+|Subscription UID
+|A client-generated unique identifier for this subscription.
+|===
+
 [[websockets-config]]
 == WebSockets Protocol Configuration
 
@@ -222,7 +315,7 @@ Clients and servers shall ignore JSON messages that:
 |<<msg-unpublish,`unpublish`>>
 |Publish Release
 |Client to Server
-|`unannounce` (if topic deleted), `announce` (if topic still published by another client)
+|`unannounce` (if topic deleted)
 
 |<<msg-setflags,`setflags`>>
 |Set Flags
@@ -241,12 +334,10 @@ Clients and servers shall ignore JSON messages that:
 |Client to Server
 |<<binary-frames,MessagePack messages>> (once topic is announced)
 
-`subscribed`
-
 |<<msg-unsubscribe,`unsubscribe`>>
 |Unsubscribe
 |Client to Server
-|`unsubscribed`
+|---
 
 4+|Announcement Messages (Server to Client)
 
@@ -257,26 +348,6 @@ Clients and servers shall ignore JSON messages that:
 
 |<<msg-unannounce,`unannounce`>>
 |Topic Removed
-|Server to Client
-|---
-
-|<<msg-connected,`connected`>>
-|Client Connected
-|Server to Client
-|---
-
-|<<msg-disconnected,`disconnected`>>
-|Client Disconnected
-|Server to Client
-|---
-
-|<<msg-subscribed,`subscribed`>>
-|Subscription Added
-|Server to Client
-|---
-
-|<<msg-unsubscribed,`unsubscribed`>>
-|Subscription Removed
 |Server to Client
 |---
 |===
@@ -471,7 +542,7 @@ The `unsubscribe` JSON message shall contain the following parameters:
 [[msg-announce]]
 ==== Topic Announcement Message (`announce`)
 
-The server shall send this message to all clients upon initial connection for each existing topic, when a topic is created, when an additional client starts or stops publishing a topic, or when any topic flags are changed.
+The server shall send this message to all clients upon initial connection for each existing topic, when a topic is created, or when any topic flags are changed.  Additionally the server shall send this message to a client in response to an `publish` message.
 
 The `announce` JSON message shall contain the following parameters:
 
@@ -486,11 +557,6 @@ The `announce` JSON message shall contain the following parameters:
 |String
 |Topic name
 |
-
-|`publishers`
-|Array of String
-|Client names
-|Clients that are publishing the topic
 
 |`id`
 |Integer
@@ -531,111 +597,6 @@ The `unannounce` JSON message shall contain the following parameters:
 |Integer
 |Topic ID
 |The identifier that the server was using for value updates
-|===
-
-[[msg-connected]]
-==== Client Connected Message (`connected`)
-
-The server shall send this message to all clients when a client connects.
-
-The `connected` JSON message shall contain the following parameters:
-
-[cols="1,1,2,6",options="header"]
-|===
-|Key
-|Value type
-|Description
-|Notes
-
-|`client`
-|String
-|Client name
-|
-
-|`connection`
-|String
-|Connection info
-|Connection information about the client; typically host:port
-|===
-
-[[msg-disconnected]]
-==== Client Disconnected Message (`disconnected`)
-
-The server shall send this message to all clients when a client disconnects.  Clients that pay attention to `subscribed` and `unsubscribed` messages shall treat a disconnect as an implicit unsubscribe for all subscriptions for the corresponding client.
-
-The `disconnected` JSON message shall contain the following parameters:
-
-[cols="1,1,2,6",options="header"]
-|===
-|Key
-|Value type
-|Description
-|Notes
-
-|`client`
-|String
-|Client name
-|
-|===
-
-[[msg-subscribed]]
-==== Subscription Added Message (`subscribed`)
-
-The server shall send this message to all clients when a client sends a <<msg-subscribe>>.
-
-The `subscribed` JSON message shall contain the following parameters:
-
-[cols="1,2,2,6",options="header"]
-|===
-|Key
-|Value type
-|Description
-|Notes
-
-|`client`
-|String
-|Client name
-|
-
-|`prefixes`
-|Array of String
-|Array of topic prefixes
-|One or more topic prefixes to start receiving messages for.
-
-|`subuid`
-|Integer
-|Subscription UID
-|A client-generated unique identifier for this subscription.  The same UID will be used for `unsubscribed`.
-
-|`options`
-|Object
-|Options
-|Subscription options, see `subscribe`
-|===
-
-[[msg-unsubscribed]]
-==== Subscription Removed Message (`unsubscribed`)
-
-The server shall send this message when a client cancels a subscription; see <<msg-unsubscribe>>.
-
-The `unsubscribed` JSON message shall contain the following parameters:
-
-[cols="1,1,2,6",options="header"]
-|===
-|Key
-|Value type
-|Description
-|Notes
-
-|`client`
-|String
-|Client name
-|
-
-|`subuid`
-|Integer
-|Subscription UID
-|The same unique identifier in the `subscribed` message.
 |===
 
 [[binary-frames]]
