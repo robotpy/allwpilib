@@ -213,7 +213,7 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 
 Both clients and servers shall support unsecure connections (`ws:`) and may support secure connections (`wss:`).  In a trusted network environment (e.g. a robot network), clients that support secure connections should fall back to an unsecure connection if a secure connection is not available.
 
-Servers shall support a resource name of `/nt/<name>`, where `<name>` is an arbitrary string representing the client name.  The client name must be unique (for a particular server).  Servers shall reject duplicate connections to the same resource name.  Clients should provide a way to specify the resource name (in particular, the client name portion) and should provide a mechanism to make the name unique (e.g. by suffixing the name with a unique identifier).
+Servers shall support a resource name of `/nt/<name>`, where `<name>` is an arbitrary string representing the client name.  The client name must be unique (for a particular server).  Servers shall reject duplicate connections to the same resource name by responding with HTTP Error Code 409 (Conflict).  Clients should provide a way to specify the resource name (in particular, the client name portion) and should provide a mechanism to make the name unique (e.g. by suffixing the name with a unique identifier).
 
 Both clients and servers shall support/use subprotocol `networktables.first.wpi.edu` for this protocol. Clients and servers shall terminate the connection in accordance with the WebSocket protocol unless both sides support this subprotocol.
 
