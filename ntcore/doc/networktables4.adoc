@@ -442,7 +442,7 @@ The `setflags` JSON message shall contain the following parameters:
 [[msg-getvalues]]
 ==== Get Values Message (`getvalues`)
 
-Sent from a client to the server to indicate the client wants to get the current values for the specified topics (identifiers).  The server shall send MessagePack messages containing the current values immediately upon receipt.  While this message could theoretically be used to poll for value updates, it is much better to use a <<msg-subscribe>> to request push updates.
+Sent from a client to the server to indicate the client wants to get the current values for the specified topics / groups of topics.  The server shall treat this identically to a `subscribe` message, except only send the values once.  The server shall send announcement messages (for virtual topics) and MessagePack messages containing the current values immediately upon receipt.  While this message could theoretically be used to poll for value updates, it is much better to use a <<msg-subscribe>> to request push updates.
 
 The `getvalues` JSON message shall contain the following parameters:
 
@@ -453,10 +453,10 @@ The `getvalues` JSON message shall contain the following parameters:
 |Description
 |Notes
 
-|`ids`
-|Array of Integer
-|Array of Topic IDs
-|One or more identifiers as provided in `announce` messages (unordered)
+|`prefixes`
+|Array of String
+|Array of topic prefixes
+|One or more topic prefixes
 |===
 
 [[msg-subscribe]]
