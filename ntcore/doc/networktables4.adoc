@@ -227,7 +227,7 @@ The unsecure standard server port number shall be 5810, the secure standard port
 [[data-types]]
 == Supported Data Types
 
-The following data types are supported.  Note: implementations may map integer and float to double internally.
+The following data types are supported.  Note: implementations may map integer and float to double internally.  Any data type string not in the table below shall be handled in the binary protocol as data type 5 (binary); some specific binary examples are included in the table below.
 
 [cols="1,1,1,1,4",options="header"]
 |===
@@ -246,20 +246,29 @@ The following data types are supported.  Note: implementations may map integer a
 |3|float 32|Number (double)|`float`
 
 
-|4|str|String|`string`
+.2+|4
+.2+|str
+.2+|String
+|`string`
 |
 
-|5|bin|Raw|`raw`
+|`json`
+|JSON data (e.g. structured data)
+
+.4+|5
+.4+|bin
+.4+|Raw
+|`raw`
 |Raw data, no specified format
 
-|6|bin|RPC|`rpc`
+|`rpc`
 |For backwards compatibility with NT 3.0
 
-|7|bin|Raw|`msgpack`
+|`msgpack`
 |Nested MessagePack data (e.g. structured data)
 
-|8|str|String|`json`
-|JSON data (e.g. structured data)
+|`protobuf`
+|Google Protocol Buffers data (structured).  Uses property `protobuf` to communicate the data description.
 
 |16|array of all bool|Boolean Array|`boolean[]`
 |All elements of the array must be boolean
@@ -277,15 +286,15 @@ The following data types are supported.  Note: implementations may map integer a
 |All elements of the array must be text strings
 |===
 
-[[flags]]
-== Supported Flags
+[[properties]]
+== Properties
 
-Flags are represented as strings.  The following flags have a defined meaning in this spec.  Servers shall support arbitrary flags being set outside of this set.  Clients shall ignore flags they do not recognize.  Flags set for a topic can be changed using <<msg-setflags>>.
+Each topic may also have properties associated to it.  Properties are represented in the protocol as JSON and thus property values may be any JSON type.  Property keys must be strings.  The following properties have a defined meaning in this spec.  Servers shall support arbitrary properties being set outside of this set.  Clients shall ignore properties they do not recognize.  Properties are initially set on publish and may be changed (by any client) using <<msg-setproperties>>.
 
-[cols="1,1,6",options="header"]
+[cols="1,1,1,6",options="header"]
 |===
-|Flag|Description|Notes
-|`persistent`|Persistent Flag|If set, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this flag set will not be deleted by the server when the last publisher stops publishing.
+|Property|Type|Description|Notes
+|`persistent`|boolean|Persistent Flag|If true, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
 |===
 
 [[text-frames]]
@@ -322,8 +331,8 @@ Clients and servers shall ignore JSON messages that:
 |Client to Server
 |`unannounce` (if topic deleted)
 
-|<<msg-setflags,`setflags`>>
-|Set Flags
+|<<msg-setproperties,`setproperties`>>
+|Set Properties
 |Client to Server
 |`announce`
 
@@ -411,35 +420,29 @@ The `unpublish` JSON message shall contain the following parameters:
 |The topic name to stop publishing
 |===
 
-[[msg-setflags]]
-==== Set Flags Message (`setflags`)
+[[msg-setproperties]]
+==== Set Properties Message (`setproperties`)
 
-Sent from a client to the server to set or clear flags (see <<flags>>) for a given topic.  The server will respond with an updated <<msg-announce>>.
+Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will respond with an updated <<msg-announce>>.
 
-The `setflags` JSON message shall contain the following parameters:
+The `setproperties` JSON message shall contain the following parameters:
 
-[cols="1,2,2,4",options="header"]
+[cols="1,2,4",options="header"]
 |===
 |Key
 |Value type
 |Description
-|Notes
 
 |`name`
 |String
 |Topic name
-|
 
-|`add`
-|Array of String
-|Flags to add
-|
-
-|`remove`
-|Array of String
-|Flags to remove
-|
+|`update`
+|Object
+|Properties to update
 |===
+
+If a property is not included in the update object, its value is not changed.  If a property is provided in the update object with a value of null, the property is deleted.
 
 [[subscription-messages]]
 === Value/Subscription Messages (Client to Server)
@@ -547,7 +550,7 @@ The `unsubscribe` JSON message shall contain the following parameters:
 [[msg-announce]]
 ==== Topic Announcement Message (`announce`)
 
-The server shall send this message to all clients upon initial connection for each existing topic, when a topic is created, or when any topic flags are changed.  Additionally the server shall send this message to a client in response to an `publish` message.
+The server shall send this message to all clients upon initial connection for each existing topic, when a topic is created, or when any topic properties are changed.  Additionally the server shall send this message to a client in response to an `publish` message.
 
 The `announce` JSON message shall contain the following parameters:
 
@@ -573,10 +576,10 @@ The `announce` JSON message shall contain the following parameters:
 |Data type
 |The data type for the topic (as a string)
 
-|`flags`
-|Array of String
-|Flags
-|Unordered list of flags set on the topic (see `setflags` message)
+|`properties`
+|Object
+|Properties
+|Topic properties (see `setproperties` message)
 |===
 
 [[msg-unannounce]]
