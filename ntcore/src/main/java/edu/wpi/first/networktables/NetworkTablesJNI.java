@@ -52,6 +52,22 @@ public final class NetworkTablesJNI {
     libraryLoaded = true;
   }
 
+  private static int[] pubSubOptionTypes(PubSubOption... options) {
+    int[] rv = new int[options.length];
+    for (int i = 0; i < options.length; i++) {
+      rv[i] = options[i].type;
+    }
+    return rv;
+  }
+
+  private static double[] pubSubOptionValues(PubSubOption... options) {
+    double[] rv = new double[options.length];
+    for (int i = 0; i < options.length; i++) {
+      rv[i] = options[i].value;
+    }
+    return rv;
+  }
+
   public static native int getDefaultInstance();
 
   public static native int createInstance();
@@ -59,6 +75,12 @@ public final class NetworkTablesJNI {
   public static native void destroyInstance(int inst);
 
   public static native int getInstanceFromHandle(int handle);
+
+  public static native String getTopicName(int topic);
+
+  public static native void setTopicPersistent(int topic, boolean value);
+
+  public static native boolean getTopicPersistent(int topic);
 
   public static native int getEntry(int inst, String key);
 
@@ -69,6 +91,30 @@ public final class NetworkTablesJNI {
   public static native long getEntryLastChange(int entry);
 
   public static native int getType(int entry);
+
+  public static native String getTypeString(int topic);
+
+  public static native int getTopicDouble(int inst, String key);
+
+  private static native int subscribeDouble(int topic, int[] optionTypes, double[] optionValues);
+
+  public static int subscribeDouble(int topic, SubscribeOption... options) {
+    return subscribeDouble(topic, pubSubOptionTypes(options), pubSubOptionValues(options));
+  }
+
+  private static native int publishDouble(int topic, int[] optionTypes, double[] optionValues);
+
+  public static int publishDouble(int topic, PublishOption... options) {
+    return publishDouble(topic, pubSubOptionTypes(options), pubSubOptionValues(options));
+  }
+
+  private static native int getEntryDouble(int topic, int[] optionTypes, double[] optionValues);
+
+  public static int getEntryDouble(int topic, PubSubOption... options) {
+    return getEntryDouble(topic, pubSubOptionTypes(options), pubSubOptionValues(options));
+  }
+
+  public static native TimestampedDouble getAtomicDouble(int entry, double defaultValue);
 
   public static native boolean setBoolean(int entry, long time, boolean value, boolean force);
 
@@ -127,6 +173,8 @@ public final class NetworkTablesJNI {
   public static native void deleteAllEntries(int inst);
 
   public static native EntryInfo getEntryInfoHandle(NetworkTableInstance inst, int entry);
+
+  public static native TopicInfo getTopicInfoHandle(NetworkTableInstance inst, int topic);
 
   public static native EntryInfo[] getEntryInfo(
       NetworkTableInstance instObject, int inst, String prefix, int types);

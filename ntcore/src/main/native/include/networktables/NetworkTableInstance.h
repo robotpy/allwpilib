@@ -14,9 +14,12 @@
 #include <wpi/ArrayRef.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
+#include <wpi/deprecated.h>
 
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
+#include "networktables/PubSubOption.h"
+#include "networktables/Topic.h"
 #include "ntcore_c.h"
 #include "ntcore_cpp.h"
 
@@ -125,12 +128,40 @@ class NetworkTableInstance final {
    */
   NT_Inst GetHandle() const;
 
+  DoublePublisher PublishDouble(const wpi::Twine& name);
+  DoubleSubscriber SubscribeDouble(
+      const wpi::Twine& name, double defaultValue,
+      wpi::ArrayRef<SubscribeOption> options = {});
+  DoubleEntry GetDoubleEntry(const wpi::Twine& name, double defaultValue);
+
+  StringPublisher PublishString(const wpi::Twine& name);
+  StringSubscriber SubscribeString(
+      const wpi::Twine& name, wpi::StringRef defaultValue,
+      wpi::ArrayRef<SubscribeOption> options = {});
+  StringEntry GetStringEntry(const wpi::Twine& name, double defaultValue);
+
+  // PrefixSubscription SubscribePrefix(const wpi::Twine& prefix,
+  // wpi::ArrayRef<SubscribeOption> options = {}); PrefixSubscription
+  // SubscribePrefix(wpi::ArrayRef<std::string> prefixes,
+  // wpi::ArrayRef<SubscribeOption> options = {});
+
+  std::vector<TopicInfo> GetTopics();
+
+  std::vector<TopicInfo> GetTopics(const wpi::Twine& prefix);
+
+  std::vector<TopicInfo> GetTopics(const wpi::Twine& prefix,
+                                   unsigned int types);
+
+  std::vector<TopicInfo> GetTopics(const wpi::Twine& prefix,
+                                   wpi::ArrayRef<std::string> types);
+
   /**
    * Gets the entry for a key.
    *
    * @param name Key
    * @return Network table entry.
    */
+  WPI_DEPRECATED("Use topics instead")
   NetworkTableEntry GetEntry(const wpi::Twine& name);
 
   /**
@@ -144,6 +175,7 @@ class NetworkTableInstance final {
    * @param types bitmask of types; 0 is treated as a "don't care"
    * @return Array of entries.
    */
+  WPI_DEPRECATED("Use GetTopics()")
   std::vector<NetworkTableEntry> GetEntries(const wpi::Twine& prefix,
                                             unsigned int types);
 
@@ -158,6 +190,7 @@ class NetworkTableInstance final {
    * @param types bitmask of types; 0 is treated as a "don't care"
    * @return Array of entry information.
    */
+  WPI_DEPRECATED("Use GetTopics()")
   std::vector<EntryInfo> GetEntryInfo(const wpi::Twine& prefix,
                                       unsigned int types) const;
 
@@ -173,6 +206,7 @@ class NetworkTableInstance final {
    * Deletes ALL keys in ALL subtables (except persistent values).
    * Use with caution!
    */
+  WPI_DEPRECATED("no longer implemented")
   void DeleteAllEntries();
 
   /**

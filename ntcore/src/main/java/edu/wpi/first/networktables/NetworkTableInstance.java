@@ -100,12 +100,28 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   /**
-   * Gets the native handle for the entry.
+   * Gets the native handle for the instance.
    *
    * @return Native handle
    */
   public int getHandle() {
     return m_handle;
+  }
+
+  public DoublePublisher publishDouble(String name, PublishOption... options) {
+    return getDoubleTopic(name).publish(options);
+  }
+
+  public DoubleSubscriber subscribeDouble(String name, double defaultValue, SubscribeOption... options) {
+    return getDoubleTopic(name).subscribe(defaultValue, options);
+  }
+
+  public DoubleEntry getDoubleEntry(String name, double defaultValue, PubSubOption... options) {
+    return getDoubleTopic(name).getEntry(defaultValue, options);
+  }
+
+  public DoubleTopic getDoubleTopic(String name) {
+    return new DoubleTopic(this, NetworkTablesJNI.getTopicDouble(m_handle, name));
   }
 
   /**

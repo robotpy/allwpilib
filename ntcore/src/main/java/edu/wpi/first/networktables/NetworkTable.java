@@ -129,6 +129,22 @@ public final class NetworkTable {
     return "NetworkTable: " + m_path;
   }
 
+  public DoublePublisher publishDouble(String name, PublishOption... options) {
+    return m_inst.publishDouble(m_pathWithSep + name, options);
+  }
+
+  public DoubleSubscriber subscribeDouble(String name, double defaultValue, SubscribeOption... options) {
+    return m_inst.subscribeDouble(m_pathWithSep + name, defaultValue, options);
+  }
+
+  public DoubleEntry getDoubleEntry(String name, double defaultValue, PubSubOption... options) {
+    return m_inst.getDoubleEntry(m_pathWithSep + name, defaultValue, options);
+  }
+
+  public DoubleTopic getDoubleTopic(String name) {
+    return m_inst.getDoubleTopic(m_pathWithSep + name);
+  }
+
   private final ConcurrentMap<String, NetworkTableEntry> m_entries = new ConcurrentHashMap<>();
 
   /**
