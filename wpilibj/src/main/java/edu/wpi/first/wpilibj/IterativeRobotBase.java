@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -32,6 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * disabledPeriodic() - autonomousPeriodic() - teleopPeriodic() - testPeriodic()
  */
 public abstract class IterativeRobotBase extends RobotBase {
+  private final ControlWord m_controlWord;
   protected double m_period;
 
   private enum Mode {
@@ -54,6 +56,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   protected IterativeRobotBase(double period) {
     m_period = period;
     m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
+    m_controlWord = new ControlWord();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
@@ -206,10 +209,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   @SuppressWarnings("PMD.CyclomaticComplexity")
   protected void loopFunc() {
+    HAL.getControlWord(m_controlWord);
     m_watchdog.reset();
 
     // Call the appropriate function depending upon the current robot mode
-    if (isDisabled()) {
+    if (!m_controlWord.getEnabled()) {
       // Call DisabledInit() if we are now just entering disabled mode from either a different mode
       // or from power-on.
       if (m_lastMode != Mode.kDisabled) {
@@ -223,7 +227,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       HAL.observeUserProgramDisabled();
       disabledPeriodic();
       m_watchdog.addEpoch("disablePeriodic()");
-    } else if (isAutonomous()) {
+    } else if (m_controlWord.getAutonomous()) {
       // Call AutonomousInit() if we are now just entering autonomous mode from either a different
       // mode or from power-on.
       if (m_lastMode != Mode.kAutonomous) {
@@ -237,7 +241,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       HAL.observeUserProgramAutonomous();
       autonomousPeriodic();
       m_watchdog.addEpoch("autonomousPeriodic()");
-    } else if (isOperatorControl()) {
+    } else if (!m_controlWord.getTest()) { //we checked disabled and auto, it's test or teleop.
       // Call TeleopInit() if we are now just entering teleop mode from either a different mode or
       // from power-on.
       if (m_lastMode != Mode.kTeleop) {
