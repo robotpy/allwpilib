@@ -41,6 +41,9 @@ typedef NT_Handle NT_Logger;
 typedef NT_Handle NT_LoggerPoller;
 typedef NT_Handle NT_RpcCall;
 typedef NT_Handle NT_RpcCallPoller;
+typedef NT_Handle NT_Topic;
+typedef NT_Handle NT_Subscriber;
+typedef NT_Handle NT_Publisher;
 
 /** Default network tables port number */
 #define NT_DEFAULT_PORT 1735
@@ -55,7 +58,12 @@ enum NT_Type {
   NT_BOOLEAN_ARRAY = 0x10,
   NT_DOUBLE_ARRAY = 0x20,
   NT_STRING_ARRAY = 0x40,
-  NT_RPC = 0x80
+  NT_RPC = 0x80,
+  NT_INTEGER = 0x100,
+  NT_FLOAT = 0x200,
+  NT_INTEGER_ARRAY = 0x400,
+  NT_FLOAT_ARRAY = 0x800,
+  NT_JSON = 0x1000
 };
 
 /** NetworkTables entry flags. */
@@ -155,6 +163,23 @@ struct NT_EntryInfo {
   unsigned int flags;
 
   /** Timestamp of last change to entry (type or value). */
+  uint64_t last_change;
+};
+
+struct NT_TopicInfo {
+  /** Topic handle */
+  NT_Topic topic;
+
+  /** Topic name */
+  struct NT_String name;
+
+  /** Topic type */
+  NT_Type type;
+
+  /** Topic type string */
+  struct NT_String type_str;
+
+  /** Timestamp of last change. */
   uint64_t last_change;
 };
 

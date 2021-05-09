@@ -21,6 +21,10 @@
 
 #include "networktables/NetworkTableValue.h"
 
+namespace wpi {
+class json;
+}  // namespace wpi
+
 /** NetworkTables (ntcore) namespace */
 namespace nt {
 
@@ -56,6 +60,35 @@ struct EntryInfo {
     swap(first.type, second.type);
     swap(first.flags, second.flags);
     swap(first.last_change, second.last_change);
+  }
+};
+
+/** NetworkTables Topic Information */
+struct TopicInfo {
+  /** Topic handle */
+  NT_Topic topic;
+
+  /** Topic name */
+  std::string name;
+
+  /** Topic type */
+  NT_Type type;
+
+  /** Topic type string */
+  std::string typeStr;
+
+  /** Timestamp of last change to topic value */
+  uint64_t lastChange;
+
+  /** Topic properties */
+  wpi::json GetProperties() const;
+
+  friend void swap(TopicInfo& first, TopicInfo& second) {
+    using std::swap;
+    swap(first.topic, second.topic);
+    swap(first.name, second.name);
+    swap(first.type, second.type);
+    swap(first.typeStr, second.typeStr);
   }
 };
 
