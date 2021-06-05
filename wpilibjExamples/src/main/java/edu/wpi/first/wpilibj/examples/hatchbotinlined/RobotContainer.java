@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj.examples.hatchbotinlined;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.OIConstants;
@@ -70,8 +69,7 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.arcadeDrive(
-                    m_driverController.getY(GenericHID.Hand.kLeft),
-                    m_driverController.getX(GenericHID.Hand.kRight)),
+                    m_driverController.getLeftY(), m_driverController.getRightX()),
             m_robotDrive));
 
     // Add commands to the autonomous command chooser
@@ -84,7 +82,7 @@ public class RobotContainer {
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
