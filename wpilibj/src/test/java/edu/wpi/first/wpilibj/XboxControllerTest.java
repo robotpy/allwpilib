@@ -19,11 +19,11 @@ class XboxControllerTest {
     XboxController joy = new XboxController(2);
     XboxControllerSim joysim = new XboxControllerSim(joy);
 
-    joysim.setX(XboxController.Hand.kLeft, 0.35);
-    joysim.setX(XboxController.Hand.kRight, 0.45);
+    joysim.setLeftX(0.35);
+    joysim.setRightX(0.45);
     joysim.notifyNewData();
-    assertEquals(0.35, joy.getX(XboxController.Hand.kLeft), 0.001);
-    assertEquals(0.45, joy.getX(XboxController.Hand.kRight), 0.001);
+    assertEquals(0.35, joy.getLeftX(), 0.001);
+    assertEquals(0.45, joy.getRightX(), 0.001);
   }
 
   @Test
@@ -32,26 +32,26 @@ class XboxControllerTest {
     XboxController joy = new XboxController(2);
     XboxControllerSim joysim = new XboxControllerSim(joy);
 
-    joysim.setBumper(XboxController.Hand.kLeft, false);
-    joysim.setBumper(XboxController.Hand.kRight, true);
+    joysim.setLeftBumper(false);
+    joysim.setRightBumper(true);
     joysim.notifyNewData();
-    assertFalse(joy.getBumper(XboxController.Hand.kLeft));
-    assertTrue(joy.getBumper(XboxController.Hand.kRight));
+    assertFalse(joy.getLeftBumper());
+    assertTrue(joy.getRightBumper());
     // need to call pressed and released to clear flags
-    joy.getBumperPressed(XboxController.Hand.kLeft);
-    joy.getBumperReleased(XboxController.Hand.kLeft);
-    joy.getBumperPressed(XboxController.Hand.kRight);
-    joy.getBumperReleased(XboxController.Hand.kRight);
+    joy.getLeftBumperPressed();
+    joy.getLeftBumperReleased();
+    joy.getRightBumperPressed();
+    joy.getRightBumperReleased();
 
-    joysim.setBumper(XboxController.Hand.kLeft, true);
-    joysim.setBumper(XboxController.Hand.kRight, false);
+    joysim.setLeftBumper(true);
+    joysim.setRightBumper(false);
     joysim.notifyNewData();
-    assertTrue(joy.getBumper(XboxController.Hand.kLeft));
-    assertTrue(joy.getBumperPressed(XboxController.Hand.kLeft));
-    assertFalse(joy.getBumperReleased(XboxController.Hand.kLeft));
-    assertFalse(joy.getBumper(XboxController.Hand.kRight));
-    assertFalse(joy.getBumperPressed(XboxController.Hand.kRight));
-    assertTrue(joy.getBumperReleased(XboxController.Hand.kRight));
+    assertTrue(joy.getLeftBumper());
+    assertTrue(joy.getLeftBumperPressed());
+    assertFalse(joy.getLeftBumperReleased());
+    assertFalse(joy.getRightBumper());
+    assertFalse(joy.getRightBumperPressed());
+    assertTrue(joy.getRightBumperReleased());
   }
 
   @Test

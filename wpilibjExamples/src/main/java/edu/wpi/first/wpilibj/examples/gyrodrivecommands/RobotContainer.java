@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.gyrodrivecommands;
 
-import static edu.wpi.first.wpilibj.XboxController.Button;
+import static edu.wpi.first.wpilibj.PS4Controller.Button;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngle;
@@ -30,7 +30,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -52,17 +52,17 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link PS4Controller}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Drive at half speed when the right bumper is held
-    new JoystickButton(m_driverController, Button.kBumperRight.value)
+    new JoystickButton(m_driverController, Button.kRightBumper.value)
         .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
         .whenReleased(() -> m_robotDrive.setMaxOutput(1));
 
     // Stabilize robot to drive straight with gyro when left bumper is held
-    new JoystickButton(m_driverController, Button.kBumperLeft.value)
+    new JoystickButton(m_driverController, Button.kLeftBumper.value)
         .whenHeld(
             new PIDCommand(
                 new PIDController(
@@ -82,8 +82,8 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kX.value)
         .whenPressed(new TurnToAngle(90, m_robotDrive).withTimeout(5));
 
-    // Turn to -90 degrees with a profile when the 'A' button is pressed, with a 5 second timeout
-    new JoystickButton(m_driverController, Button.kA.value)
+    // Turn to -90 degrees with a profile when the Circle button is pressed, with a 5 second timeout
+    new JoystickButton(m_driverController, Button.kCircle.value)
         .whenPressed(new TurnToAngleProfiled(-90, m_robotDrive).withTimeout(5));
   }
 

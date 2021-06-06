@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbotinlined;
 
-import static edu.wpi.first.wpilibj.XboxController.Button;
+import static edu.wpi.first.wpilibj.PS4Controller.Button;
 
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.commands.ComplexAutoCommand;
@@ -54,7 +54,7 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  PS4Controller m_driverController = new PS4Controller(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -83,18 +83,18 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link PS4Controller}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Grab the hatch when the 'A' button is pressed.
-    new JoystickButton(m_driverController, Button.kA.value)
+    // Grab the hatch when the Circle button is pressed.
+    new JoystickButton(m_driverController, Button.kCircle.value)
         .whenPressed(new InstantCommand(m_hatchSubsystem::grabHatch, m_hatchSubsystem));
-    // Release the hatch when the 'B' button is pressed.
-    new JoystickButton(m_driverController, Button.kB.value)
+    // Release the hatch when the Square button is pressed.
+    new JoystickButton(m_driverController, Button.kSquare.value)
         .whenPressed(new InstantCommand(m_hatchSubsystem::releaseHatch, m_hatchSubsystem));
     // While holding the shoulder button, drive at half speed
-    new JoystickButton(m_driverController, Button.kBumperRight.value)
+    new JoystickButton(m_driverController, Button.kRightBumper.value)
         .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
         .whenReleased(() -> m_robotDrive.setMaxOutput(1));
   }
