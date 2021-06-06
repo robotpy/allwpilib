@@ -35,72 +35,94 @@ class XboxController : public GenericHID {
   XboxController& operator=(XboxController&&) = default;
 
   /**
-   * Get the X axis value of the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
+   * Get the left X axis value of the controller.
    */
-  double GetX(JoystickHand hand) const override;
+  double GetLeftX() const;
 
   /**
-   * Get the Y axis value of the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
+   * Get the right X axis value of the controller.
    */
-  double GetY(JoystickHand hand) const override;
+  double GetRightX() const;
 
   /**
-   * Get the trigger axis value of the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
+   * Get the left Y axis value of the controller.
    */
-  double GetTriggerAxis(JoystickHand hand) const;
+  double GetLeftY() const;
 
   /**
-   * Read the value of the bumper button on the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
+   * Get the right Y axis value of the controller.
    */
-  bool GetBumper(JoystickHand hand) const;
+  double GetRightY() const;
 
   /**
-   * Whether the bumper was pressed since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was pressed since the last check.
+   * Get the left trigger axis axis value of the controller.
    */
-  bool GetBumperPressed(JoystickHand hand);
+  double GetLeftTriggerAxis() const;
 
   /**
-   * Whether the bumper was released since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was released since the last check.
+   * Get the right TriggerAxis axis value of the controller.
    */
-  bool GetBumperReleased(JoystickHand hand);
+  double GetRightTriggerAxis() const;
 
   /**
-   * Read the value of the stick button on the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return The state of the button.
+   * Read the value of the left bumper button on the controller.
    */
-  bool GetStickButton(JoystickHand hand) const;
+  bool GetLeftBumper() const;
 
   /**
-   * Whether the stick button was pressed since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was pressed since the last check.
+   * Read the value of the right bumper button on the controller.
    */
-  bool GetStickButtonPressed(JoystickHand hand);
+  bool GetRightBumper() const;
 
   /**
-   * Whether the stick button was released since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was released since the last check.
+   * Whether the left bumper was pressed since the last check.
    */
-  bool GetStickButtonReleased(JoystickHand hand);
+  bool GetLeftBumperPressed();
+
+  /**
+   * Whether the right bumper was pressed since the last check.
+   */
+  bool GetRightBumperPressed();
+
+  /**
+   * Whether the left bumper was released since the last check.
+   */
+  bool GetLeftBumperReleased();
+
+  /**
+   * Whether the right bumper was released since the last check.
+   */
+  bool GetRightBumperReleased();
+
+  /**
+   * Read the value of the left stick button on the controller.
+   */
+  bool GetLeftStickButton() const;
+
+  /**
+   * Read the value of the right stick button on the controller.
+   */
+  bool GetRightStickButton() const;
+
+  /**
+   * Whether the left stick button was pressed since the last check.
+   */
+  bool GetLeftStickButtonPressed();
+
+  /**
+   * Whether the right stick button was pressed since the last check.
+   */
+  bool GetRightStickButtonPressed();
+
+  /**
+   * Whether the left stick button was released since the last check.
+   */
+  bool GetLeftStickButtonReleased();
+
+  /**
+   * Whether the right stick button was released since the last check.
+   */
+  bool GetRightStickButtonReleased();
 
   /**
    * Read the value of the A button on the controller.
@@ -210,7 +232,6 @@ class XboxController : public GenericHID {
   /**
    * Read the value of the start button on the controller.
    *
-   * @param hand Side of controller whose value should be returned.
    * @return The state of the button.
    */
   bool GetStartButton() const;

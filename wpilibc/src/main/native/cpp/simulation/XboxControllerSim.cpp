@@ -20,46 +20,44 @@ XboxControllerSim::XboxControllerSim(int port) : GenericHIDSim{port} {
   SetButtonCount(10);
 }
 
-void XboxControllerSim::SetX(GenericHID::JoystickHand hand, double value) {
-  if (hand == GenericHID::kLeftHand) {
-    SetRawAxis(static_cast<int>(XboxController::Axis::kLeftX), value);
-  } else {
-    SetRawAxis(static_cast<int>(XboxController::Axis::kRightX), value);
-  }
+void XboxControllerSim::SetLeftX(double value) {
+  SetRawAxis(static_cast<int>(XboxController::Axis::kLeftX), value);
 }
 
-void XboxControllerSim::SetY(GenericHID::JoystickHand hand, double value) {
-  if (hand == GenericHID::kLeftHand) {
-    SetRawAxis(static_cast<int>(XboxController::Axis::kLeftY), value);
-  } else {
-    SetRawAxis(static_cast<int>(XboxController::Axis::kRightY), value);
-  }
+void XboxControllerSim::SetRightX(double value) {
+  SetRawAxis(static_cast<int>(XboxController::Axis::kRightX), value);
 }
 
-void XboxControllerSim::SetTriggerAxis(GenericHID::JoystickHand hand,
-                                       double value) {
-  if (hand == GenericHID::kLeftHand) {
-    SetRawAxis(static_cast<int>(XboxController::Axis::kLeftTrigger), value);
-  } else {
-    SetRawAxis(static_cast<int>(XboxController::Axis::kRightTrigger), value);
-  }
+void XboxControllerSim::SetLeftY(double value) {
+  SetRawAxis(static_cast<int>(XboxController::Axis::kLeftY), value);
 }
 
-void XboxControllerSim::SetBumper(GenericHID::JoystickHand hand, bool state) {
-  if (hand == GenericHID::kLeftHand) {
-    SetRawButton(static_cast<int>(XboxController::Button::kBumperLeft), state);
-  } else {
-    SetRawButton(static_cast<int>(XboxController::Button::kBumperRight), state);
-  }
+void XboxControllerSim::SetRightY(double value) {
+  SetRawAxis(static_cast<int>(XboxController::Axis::kRightY), value);
 }
 
-void XboxControllerSim::SetStickButton(GenericHID::JoystickHand hand,
-                                       bool state) {
-  if (hand == GenericHID::kLeftHand) {
-    SetRawButton(static_cast<int>(XboxController::Button::kStickLeft), state);
-  } else {
-    SetRawButton(static_cast<int>(XboxController::Button::kStickRight), state);
-  }
+void XboxControllerSim::SetLeftTriggerAxis(double value) {
+  SetRawAxis(static_cast<int>(XboxController::Axis::kLeftTrigger), value);
+}
+
+void XboxControllerSim::SetRightTriggerAxis(double value) {
+  SetRawAxis(static_cast<int>(XboxController::Axis::kRightTrigger), value);
+}
+
+void XboxControllerSim::SetLeftBumper(bool state) {
+  SetRawButton(static_cast<int>(XboxController::Button::kBumperLeft), state);
+}
+
+void XboxControllerSim::SetRightBumper(bool state) {
+  SetRawButton(static_cast<int>(XboxController::Button::kBumperRight), state);
+}
+
+void XboxControllerSim::SetLeftStickButton(bool state) {
+  SetRawButton(static_cast<int>(XboxController::Button::kStickLeft), state);
+}
+
+void XboxControllerSim::SetRightStickButton(bool state) {
+  SetRawButton(static_cast<int>(XboxController::Button::kStickRight), state);
 }
 
 void XboxControllerSim::SetAButton(bool state) {

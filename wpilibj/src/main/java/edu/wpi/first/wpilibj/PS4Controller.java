@@ -11,7 +11,6 @@ import edu.wpi.first.hal.HAL;
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
 public class PS4Controller extends GenericHID {
-
   /**
    * Construct an instance of a device.
    *
@@ -55,7 +54,7 @@ public class PS4Controller extends GenericHID {
     kLeftTrigger(3),
     kRightTrigger(4);
 
-    private final int value;
+    public final int value;
 
     Axis(int index) {
       value = index;
