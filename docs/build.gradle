@@ -75,6 +75,7 @@ doxygen {
     generate_treeview true
     extract_static true
     full_path_names true
+    case_sense_names false
     strip_from_inc_path cppIncludeRoots as String[]
     strip_from_path cppIncludeRoots as String[]
 }
