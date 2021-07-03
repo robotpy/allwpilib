@@ -48,15 +48,16 @@ constexpr double kEncoderDistancePerPulse =
 // theoretically for *your* robot's drive. The Robot Characterization
 // Toolsuite provides a convenient tool for obtaining these values for your
 // robot.
-constexpr auto ks = 0.22_V;
-constexpr auto kv = 1.98 * 1_V * 1_s / 1_m;
-constexpr auto ka = 0.2 * 1_V * 1_s * 1_s / 1_m;
+constexpr auto kS = 0.22_V;
+constexpr auto kV = 1.98 * 1_V * 1_s / 1_m;
+constexpr auto kA = 0.2 * 1_V * 1_s * 1_s / 1_m;
 
 // Example value only - as above, this must be tuned for your drive!
 constexpr double kPDriveVel = 8.5;
 }  // namespace DriveConstants
 
 namespace AutoConstants {
+constexpr auto kTimestep = 0.02_s;
 constexpr auto kMaxSpeed = 3_mps;
 constexpr auto kMaxAcceleration = 3_mps_sq;
 

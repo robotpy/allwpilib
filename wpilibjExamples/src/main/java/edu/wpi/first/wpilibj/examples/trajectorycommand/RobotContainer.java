@@ -2,12 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.examples.ramsetecommand;
+package edu.wpi.first.wpilibj.examples.trajectorycommand;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,12 +16,11 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.AutoConstants;
-import edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants;
-import edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.OIConstants;
-import edu.wpi.first.wpilibj.examples.ramsetecommand.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj.examples.trajectorycommand.Constants.AutoConstants;
+import edu.wpi.first.wpilibj.examples.trajectorycommand.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.trajectorycommand.Constants.OIConstants;
+import edu.wpi.first.wpilibj.examples.trajectorycommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
@@ -111,27 +108,6 @@ public class RobotContainer {
             // Pass config
             config);
 
-    RamseteCommand ramseteCommand =
-        new RamseteCommand(
-            exampleTrajectory,
-            m_robotDrive::getPose,
-            new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
-            new SimpleMotorFeedforward(
-                DriveConstants.ksVolts,
-                DriveConstants.kvVoltSecondsPerMeter,
-                DriveConstants.kaVoltSecondsSquaredPerMeter),
-            DriveConstants.kDriveKinematics,
-            m_robotDrive::getWheelSpeeds,
-            new PIDController(DriveConstants.kPDriveVel, 0, 0),
-            new PIDController(DriveConstants.kPDriveVel, 0, 0),
-            // RamseteCommand passes volts to the callback
-            m_robotDrive::tankDriveVolts,
-            m_robotDrive);
-
-    // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Run path following command, then stop at the end.
-    return ramseteCommand.andThen(() -> m_robotDrive.tankDriveVolts(0, 0));
+    return m_robotDrive.buildTrajectoryGroup(exampleTrajectory);
   }
 }

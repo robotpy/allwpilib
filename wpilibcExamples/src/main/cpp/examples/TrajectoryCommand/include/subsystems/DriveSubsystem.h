@@ -6,11 +6,15 @@
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
+#include <frc/controller/PIDController.h>
+#include <frc/controller/RamseteController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
+#include <frc2/command/Command.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/voltage.h>
 
@@ -30,18 +34,18 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Drives the robot using arcade controls.
    *
-   * @param fwd the commanded forward movement
-   * @param rot the commanded rotation
+   * @param fwd The commanded forward movement
+   * @param rot The commanded rotation
    */
   void ArcadeDrive(double fwd, double rot);
 
   /**
-   * Controls each side of the drive directly with a voltage.
+   * Reaches the given target state. Used internally to follow the
+   * TrajectoryCommand's output.
    *
-   * @param left the commanded left output
-   * @param right the commanded right output
+   * @param targetState The target state struct.
    */
-  void TankDriveVolts(units::volt_t left, units::volt_t right);
+  void FollowState(const frc::Trajectory::State& targetState);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -51,36 +55,22 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Gets the average distance of the TWO encoders.
    *
-   * @return the average of the TWO encoder readings
+   * @return The average of the TWO encoder readings
    */
   double GetAverageEncoderDistance();
-
-  /**
-   * Gets the left drive encoder.
-   *
-   * @return the left drive encoder
-   */
-  frc::Encoder& GetLeftEncoder();
-
-  /**
-   * Gets the right drive encoder.
-   *
-   * @return the right drive encoder
-   */
-  frc::Encoder& GetRightEncoder();
 
   /**
    * Sets the max output of the drive.  Useful for scaling the drive to drive
    * more slowly.
    *
-   * @param maxOutput the maximum output to which the drive will be constrained
+   * @param maxOutput The maximum output to which the drive will be constrained
    */
   void SetMaxOutput(double maxOutput);
 
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from -180 to 180
+   * @return The robot's heading in degrees, from -180 to 180
    */
   units::degree_t GetHeading() const;
 
@@ -99,18 +89,25 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::Pose2d GetPose();
 
   /**
-   * Returns the current wheel speeds of the robot.
-   *
-   * @return The current wheel speeds.
-   */
-  frc::DifferentialDriveWheelSpeeds GetWheelSpeeds();
-
-  /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
    */
   void ResetOdometry(frc::Pose2d pose);
+
+  /**
+   * Build a command group for the given trajectory, which includes:
+   *
+   * <p>- resetting the odometry to the trajectory's initial pose
+   *
+   * <p>- following the trajectory
+   *
+   * <p>- stopping at the end of the path
+   *
+   * @param trajectory The path to follow
+   * @return A command group that tracks the given trajectory
+   */
+  frc2::Command* BuildTrajectoryGroup(const frc::Trajectory& trajectory);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
@@ -140,6 +137,21 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // The gyro sensor
   frc::ADXRS450_Gyro m_gyro;
 
+  // The RAMSETE controller
+  frc::RamseteController m_ramseteController;
+
+  // The PID controllers for each side
+  frc::PIDController m_leftController;
+  frc::PIDController m_rightController;
+
+  // The feedforward
+  // If the two sides of the drivetrain are different,
+  // a separate feedforward object can be used for each side
+  frc::SimpleMotorFeedforward<units::meters> m_feedforward;
+
   // Odometry class for tracking robot pose
   frc::DifferentialDriveOdometry m_odometry;
+
+  // Track previous target velocities for feedforward calculation
+  frc::DifferentialDriveWheelSpeeds m_previousSpeeds;
 };
