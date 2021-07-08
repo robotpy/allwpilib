@@ -93,8 +93,8 @@ public class RobotContainer {
     // Release the hatch when the Square button is pressed.
     new JoystickButton(m_driverController, Button.kSquare.value)
         .whenPressed(new InstantCommand(m_hatchSubsystem::releaseHatch, m_hatchSubsystem));
-    // While holding the shoulder button, drive at half speed
-    new JoystickButton(m_driverController, Button.kRightBumper.value)
+    // While holding R1, drive at half speed
+    new JoystickButton(m_driverController, Button.kR1.value)
         .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
         .whenReleased(() -> m_robotDrive.setMaxOutput(1));
   }

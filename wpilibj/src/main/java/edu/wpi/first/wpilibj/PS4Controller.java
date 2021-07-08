@@ -24,13 +24,13 @@ public class PS4Controller extends GenericHID {
   /** Represents a digital button on a PS4Controller. */
   public enum Button {
     kSquare(1),
-    kX(2),
+    kCross(2),
     kCircle(3),
     kTriangle(4),
-    kLeftBumper(5),
-    kRightBumper(6),
-    kLeftTrigger(7),
-    kRightTrigger(8),
+    kL1(5),
+    kR1(6),
+    kL2(7),
+    kR2(8),
     kShare(9),
     kOptions(10),
     kLeftStick(11),
@@ -51,8 +51,8 @@ public class PS4Controller extends GenericHID {
     kLeftY(1),
     kRightX(2),
     kRightY(5),
-    kLeftTrigger(3),
-    kRightTrigger(4);
+    kL2(3),
+    kR2(4);
 
     public final int value;
 
@@ -102,8 +102,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return The left trigger axis value of the controller.
    */
-  public double getLeftTriggerAxis() {
-    return getRawAxis(Axis.kLeftTrigger.value);
+  public double getL2Axis() {
+    return getRawAxis(Axis.kL2.value);
   }
 
   /**
@@ -111,8 +111,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return The right trigger axis value of the controller.
    */
-  public double getRightTriggerAxis() {
-    return getRawAxis(Axis.kRightTrigger.value);
+  public double getR2Axis() {
+    return getRawAxis(Axis.kR2.value);
   }
 
   /**
@@ -120,8 +120,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return The state of the button.
    */
-  public boolean getLeftTriggerButton() {
-    return getRawButton(Button.kLeftTrigger.value);
+  public boolean getL2Button() {
+    return getRawButton(Button.kL2.value);
   }
 
   /**
@@ -129,8 +129,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return The state of the button.
    */
-  public boolean getRightTriggerButton() {
-    return getRawButton(Button.kRightTrigger.value);
+  public boolean getR2Button() {
+    return getRawButton(Button.kR2.value);
   }
 
   /**
@@ -138,8 +138,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getLeftTriggerPressedButton() {
-    return getRawButtonPressed(Button.kLeftTrigger.value);
+  public boolean getL2PressedButton() {
+    return getRawButtonPressed(Button.kL2.value);
   }
 
   /**
@@ -147,8 +147,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getRightTriggerButtonPressed() {
-    return getRawButtonPressed(Button.kRightTrigger.value);
+  public boolean getR2ButtonPressed() {
+    return getRawButtonPressed(Button.kR2.value);
   }
 
   /**
@@ -156,8 +156,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getLeftTriggerButtonReleased() {
-    return getRawButtonReleased(Button.kLeftTrigger.value);
+  public boolean getL2ButtonReleased() {
+    return getRawButtonReleased(Button.kL2.value);
   }
 
   /**
@@ -165,8 +165,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getRightTriggerButtonReleased() {
-    return getRawButtonPressed(Button.kRightTrigger.value);
+  public boolean getR2ButtonReleased() {
+    return getRawButtonPressed(Button.kR2.value);
   }
 
   /**
@@ -174,8 +174,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return The state of the button.
    */
-  public boolean getLeftBumper() {
-    return getRawButton(Button.kLeftBumper.value);
+  public boolean getL1() {
+    return getRawButton(Button.kL1.value);
   }
 
   /**
@@ -183,8 +183,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return The state of the button.
    */
-  public boolean getRightBumper() {
-    return getRawButton(Button.kRightBumper.value);
+  public boolean getR1() {
+    return getRawButton(Button.kR1.value);
   }
 
   /**
@@ -192,8 +192,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getLeftBumperPressed() {
-    return getRawButtonPressed(Button.kLeftBumper.value);
+  public boolean getL1Pressed() {
+    return getRawButtonPressed(Button.kL1.value);
   }
 
   /**
@@ -201,8 +201,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getRightBumperPressed() {
-    return getRawButtonPressed(Button.kRightBumper.value);
+  public boolean getR1Pressed() {
+    return getRawButtonPressed(Button.kR1.value);
   }
 
   /**
@@ -210,8 +210,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getLeftBumperReleased() {
-    return getRawButtonReleased(Button.kLeftBumper.value);
+  public boolean getL1Released() {
+    return getRawButtonReleased(Button.kL1.value);
   }
 
   /**
@@ -219,8 +219,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getRightBumperReleased() {
-    return getRawButtonPressed(Button.kRightBumper.value);
+  public boolean getR1Released() {
+    return getRawButtonPressed(Button.kR1.value);
   }
 
   /**
@@ -309,8 +309,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return The state of the button.
    */
-  public boolean getXButton() {
-    return getRawButton(Button.kX.value);
+  public boolean getCrossButton() {
+    return getRawButton(Button.kCross.value);
   }
 
   /**
@@ -318,8 +318,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getXButtonPressed() {
-    return getRawButtonPressed(Button.kX.value);
+  public boolean getCrossButtonPressed() {
+    return getRawButtonPressed(Button.kCross.value);
   }
 
   /**
@@ -327,8 +327,8 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was released since the last check.
    */
-  public boolean getXButtonReleased() {
-    return getRawButtonReleased(Button.kX.value);
+  public boolean getCrossButtonReleased() {
+    return getRawButtonReleased(Button.kCross.value);
   }
 
   /**
