@@ -36,35 +36,161 @@ double PS4Controller::GetR2Axis() const {
   return GetRawAxis(static_cast<int>(Axis::kR2));
 }
 
-#define BUTTON_DEF(NAME) \
-bool PS4Controller::Get##NAME##Button() const {\
-  return GetRawButton(static_cast<int>(Button::k##NAME));\
-}\
-\
-bool PS4Controller::Get##NAME##ButtonPressed() {\
-  return GetRawButtonPressed(static_cast<int>(Button::k##NAME));\
-}\
-\
-bool PS4Controller::Get##NAME##ButtonReleased() {\
-  return GetRawButtonReleased(static_cast<int>(Button::k##NAME));\
+bool PS4Controller::GetSquareButton() const {
+  return GetRawButton(static_cast<int>(Button::kSquare));
 }
 
-BUTTON_DEF(Square)
-BUTTON_DEF(Cross)
-BUTTON_DEF(Circle)
-BUTTON_DEF(Triangle)
-BUTTON_DEF(L1)
-BUTTON_DEF(R1)
-BUTTON_DEF(L2)
-BUTTON_DEF(R2)
-BUTTON_DEF(Share)
-BUTTON_DEF(Options)
-BUTTON_DEF(LeftStick)
-BUTTON_DEF(RightStick)
-BUTTON_DEF(PS)
+bool PS4Controller::GetSquareButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kSquare));
+}
 
-#undef BUTTON_DEF
-// to avoid ScreenButton naming, the Screen functions don't use the macro
+bool PS4Controller::GetSquareButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kSquare));
+}
+
+bool PS4Controller::GetCrossButton() const {
+  return GetRawButton(static_cast<int>(Button::kCross));
+}
+
+bool PS4Controller::GetCrossButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kCross));
+}
+
+bool PS4Controller::GetCrossButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kCross));
+}
+
+bool PS4Controller::GetCircleButton() const {
+  return GetRawButton(static_cast<int>(Button::kCircle));
+}
+
+bool PS4Controller::GetCircleButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kCircle));
+}
+
+bool PS4Controller::GetCircleButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kCircle));
+}
+
+bool PS4Controller::GetTriangleButton() const {
+  return GetRawButton(static_cast<int>(Button::kTriangle));
+}
+
+bool PS4Controller::GetTriangleButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kTriangle));
+}
+
+bool PS4Controller::GetTriangleButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kTriangle));
+}
+
+bool PS4Controller::GetL1Button() const {
+  return GetRawButton(static_cast<int>(Button::kL1));
+}
+
+bool PS4Controller::GetL1ButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kL1));
+}
+
+bool PS4Controller::GetL1ButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kL1));
+}
+
+bool PS4Controller::GetR1Button() const {
+  return GetRawButton(static_cast<int>(Button::kR1));
+}
+
+bool PS4Controller::GetR1ButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kR1));
+}
+
+bool PS4Controller::GetR1ButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kR1));
+}
+
+bool PS4Controller::GetL2Button() const {
+  return GetRawButton(static_cast<int>(Button::kL2));
+}
+
+bool PS4Controller::GetL2ButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kL2));
+}
+
+bool PS4Controller::GetL2ButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kL2));
+}
+
+bool PS4Controller::GetR2Button() const {
+  return GetRawButton(static_cast<int>(Button::kR2));
+}
+
+bool PS4Controller::GetR2ButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kR2));
+}
+
+bool PS4Controller::GetR2ButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kR2));
+}
+
+bool PS4Controller::GetShareButton() const {
+  return GetRawButton(static_cast<int>(Button::kShare));
+}
+
+bool PS4Controller::GetShareButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kShare));
+}
+
+bool PS4Controller::GetShareButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kShare));
+}
+
+bool PS4Controller::GetOptionsButton() const {
+  return GetRawButton(static_cast<int>(Button::kOptions));
+}
+
+bool PS4Controller::GetOptionsButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kOptions));
+}
+
+bool PS4Controller::GetOptionsButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kOptions));
+}
+
+bool PS4Controller::GetLeftStickButton() const {
+  return GetRawButton(static_cast<int>(Button::kLeftStick));
+}
+
+bool PS4Controller::GetLeftStickButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kLeftStick));
+}
+
+bool PS4Controller::GetLeftStickButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kLeftStick));
+}
+
+bool PS4Controller::GetRightStickButton() const {
+  return GetRawButton(static_cast<int>(Button::kRightStick));
+}
+
+bool PS4Controller::GetRightStickButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kRightStick));
+}
+
+bool PS4Controller::GetRightStickButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kRightStick));
+}
+
+bool PS4Controller::GetPSButton() const {
+  return GetRawButton(static_cast<int>(Button::kPS));
+}
+
+bool PS4Controller::GetPSButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kPS));
+}
+
+bool PS4Controller::GetPSButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kPS));
+}
 
 bool PS4Controller::GetScreen() const {
   return GetRawButton(static_cast<int>(Button::kScreen));
