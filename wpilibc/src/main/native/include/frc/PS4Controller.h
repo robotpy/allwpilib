@@ -11,9 +11,10 @@ namespace frc {
 /**
  * Handle input from PS4 controllers connected to the Driver Station.
  *
- * <p>This class handles PS4 input that comes from the Driver Station. Each time a value is
- * requested the most recent value is returned. There is a single class instance for each controller
- * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
+ * <p>This class handles PS4 input that comes from the Driver Station. Each time
+ * a value is requested the most recent value is returned. There is a single
+ * class instance for each controller and the mapping of ports to hardware
+ * buttons depends on the code in the Driver Station.
  */
 class PS4Controller : public GenericHID {
  public:
@@ -356,7 +357,7 @@ class PS4Controller : public GenericHID {
    */
   bool GetScreenReleased();
 
-enum class Button {
+  enum class Button {
     kSquare = 1,
     kCross = 2,
     kCircle = 3,

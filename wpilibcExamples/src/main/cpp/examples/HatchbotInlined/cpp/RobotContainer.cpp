@@ -33,11 +33,16 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // Grab the hatch when the 'Circle' button is pressed.
-  frc2::JoystickButton(&m_driverController, static_cast<int>(frc::PS4Controller::Button::kCircle)).WhenPressed(&m_grabHatch);
+  frc2::JoystickButton(&m_driverController,
+                       static_cast<int>(frc::PS4Controller::Button::kCircle))
+      .WhenPressed(&m_grabHatch);
   // Release the hatch when the 'Square' button is pressed.
-  frc2::JoystickButton(&m_driverController, static_cast<int>(frc::PS4Controller::Button::kSquare)).WhenPressed(&m_releaseHatch);
+  frc2::JoystickButton(&m_driverController,
+                       static_cast<int>(frc::PS4Controller::Button::kSquare))
+      .WhenPressed(&m_releaseHatch);
   // While holding R1, drive at half speed
-  frc2::JoystickButton(&m_driverController, static_cast<int>(frc::PS4Controller::Button::kR1))
+  frc2::JoystickButton(&m_driverController,
+                       static_cast<int>(frc::PS4Controller::Button::kR1))
       .WhenPressed(&m_driveHalfSpeed)
       .WhenReleased(&m_driveFullSpeed);
 }
