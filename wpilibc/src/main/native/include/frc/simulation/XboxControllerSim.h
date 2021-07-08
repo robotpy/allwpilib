@@ -78,70 +78,70 @@ class XboxControllerSim : public GenericHIDSim {
    *
    * @param value the new value
    */
-  void SetLeftBumper(bool state);
+  void SetLeftBumper(bool value);
 
   /**
    * Change the right bumper value of the joystick.
    *
    * @param value the new value
    */
-  void SetRightBumper(bool state);
+  void SetRightBumper(bool value);
 
   /**
    * Change the left button value of the joystick.
    *
    * @param value the new value
    */
-  void SetLeftStickButton(bool state);
+  void SetLeftStickButton(bool value);
 
   /**
    * Change the right button value of the joystick.
    *
    * @param value the new value
    */
-  void SetRightStickButton(bool state);
+  void SetRightStickButton(bool value);
 
   /**
    * Change the value of the A button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetAButton(bool state);
+  void SetAButton(bool value);
 
   /**
    * Change the value of the B button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetBButton(bool state);
+  void SetBButton(bool value);
 
   /**
    * Change the value of the X button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetXButton(bool state);
+  void SetXButton(bool value);
 
   /**
    * Change the value of the Y button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetYButton(bool state);
+  void SetYButton(bool value);
 
   /**
    * Change the value of the Back button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetBackButton(bool state);
+  void SetBackButton(bool value);
 
   /**
    * Change the value of the Start button.
    *
-   * @param state the new value
+   * @param value the new value
    */
-  void SetStartButton(bool state);
+  void SetStartButton(bool value);
 };
 
 }  // namespace sim
