@@ -46,7 +46,8 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController, 6)
+  frc2::JoystickButton(&m_driverController,
+                       frc::XboxController::Button::kBumperRight)
       .WhenPressed(&m_driveHalfSpeed)
       .WhenReleased(&m_driveFullSpeed);
 }

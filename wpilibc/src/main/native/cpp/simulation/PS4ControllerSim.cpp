@@ -21,77 +21,77 @@ PS4ControllerSim::PS4ControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void PS4ControllerSim::SetLeftX(double value) {
-  SetRawAxis(static_cast<int>(PS4Controller::Axis::kLeftX), value);
+  SetRawAxis(PS4Controller::Axis::kLeftX, value);
 }
 
 void PS4ControllerSim::SetRightX(double value) {
-  SetRawAxis(static_cast<int>(PS4Controller::Axis::kRightX), value);
+  SetRawAxis(PS4Controller::Axis::kRightX, value);
 }
 
 void PS4ControllerSim::SetLeftY(double value) {
-  SetRawAxis(static_cast<int>(PS4Controller::Axis::kLeftY), value);
+  SetRawAxis(PS4Controller::Axis::kLeftY, value);
 }
 
 void PS4ControllerSim::SetRightY(double value) {
-  SetRawAxis(static_cast<int>(PS4Controller::Axis::kRightY), value);
+  SetRawAxis(PS4Controller::Axis::kRightY, value);
 }
 
 void PS4ControllerSim::SetL2Axis(double value) {
-  SetRawAxis(static_cast<int>(PS4Controller::Axis::kL2), value);
+  SetRawAxis(PS4Controller::Axis::kL2, value);
 }
 
 void PS4ControllerSim::SetR2Axis(double value) {
-  SetRawAxis(static_cast<int>(PS4Controller::Axis::kR2), value);
+  SetRawAxis(PS4Controller::Axis::kR2, value);
 }
 
 void PS4ControllerSim::SetSquareButton(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kSquare), value);
+  SetRawButton(PS4Controller::Button::kSquare, value);
 }
 
 void PS4ControllerSim::SetCrossButton(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kCross), value);
+  SetRawButton(PS4Controller::Button::kCross, value);
 }
 
 void PS4ControllerSim::SetCircleButton(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kCircle), value);
+  SetRawButton(PS4Controller::Button::kCircle, value);
 }
 
 void PS4ControllerSim::SetTriangleButton(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kTriangle), value);
+  SetRawButton(PS4Controller::Button::kTriangle, value);
 }
 
 void PS4ControllerSim::SetL1Button(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kL1), value);
+  SetRawButton(PS4Controller::Button::kL1, value);
 }
 
 void PS4ControllerSim::SetR1Button(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kR1), value);
+  SetRawButton(PS4Controller::Button::kR1, value);
 }
 
 void PS4ControllerSim::SetL2Button(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kL2), value);
+  SetRawButton(PS4Controller::Button::kL2, value);
 }
 
 void PS4ControllerSim::SetR2Button(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kR2), value);
+  SetRawButton(PS4Controller::Button::kR2, value);
 }
 
 void PS4ControllerSim::SetShareButton(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kShare), value);
+  SetRawButton(PS4Controller::Button::kShare, value);
 }
 
 void PS4ControllerSim::SetOptionsButton(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kOptions), value);
+  SetRawButton(PS4Controller::Button::kOptions, value);
 }
 
 void PS4ControllerSim::SetLeftStickButton(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kLeftStick), value);
+  SetRawButton(PS4Controller::Button::kLeftStick, value);
 }
 
 void PS4ControllerSim::SetRightStickButton(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kRightStick), value);
+  SetRawButton(PS4Controller::Button::kRightStick, value);
 }
 
 void PS4ControllerSim::SetPSButton(bool value) {
-  SetRawButton(static_cast<int>(PS4Controller::Button::kPS), value);
+  SetRawButton(PS4Controller::Button::kPS, value);
 }

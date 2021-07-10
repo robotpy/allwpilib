@@ -23,7 +23,7 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  frc::XboxController m_hid{0};
+  frc::GenericHID m_hid{0};
 };
 
 #ifndef RUNNING_FRC_TESTS

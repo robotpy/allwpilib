@@ -250,26 +250,26 @@ class XboxController : public GenericHID {
    */
   bool GetStartButtonReleased();
 
-  enum class Button {
-    kBumperLeft = 5,
-    kBumperRight = 6,
-    kStickLeft = 9,
-    kStickRight = 10,
-    kA = 1,
-    kB = 2,
-    kX = 3,
-    kY = 4,
-    kBack = 7,
-    kStart = 8
+  struct Button {
+    static constexpr int kBumperLeft = 5;
+    static constexpr int kBumperRight = 6;
+    static constexpr int kStickLeft = 9;
+    static constexpr int kStickRight = 10;
+    static constexpr int kA = 1;
+    static constexpr int kB = 2;
+    static constexpr int kX = 3;
+    static constexpr int kY = 4;
+    static constexpr int kBack = 7;
+    static constexpr int kStart = 8;
   };
 
-  enum class Axis {
-    kLeftX = 0,
-    kRightX = 4,
-    kLeftY = 1,
-    kRightY = 5,
-    kLeftTrigger = 2,
-    kRightTrigger = 3
+  struct Axis {
+    static constexpr int kLeftX = 0;
+    static constexpr int kRightX = 4;
+    static constexpr int kLeftY = 1;
+    static constexpr int kRightY = 5;
+    static constexpr int kLeftTrigger = 2;
+    static constexpr int kRightTrigger = 3;
   };
 };
 

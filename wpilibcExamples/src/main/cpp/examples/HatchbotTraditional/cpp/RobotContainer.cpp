@@ -40,13 +40,14 @@ void RobotContainer::ConfigureButtonBindings() {
   // stack-allocated and declared as members of RobotContainer.
 
   // Grab the hatch when the 'A' button is pressed.
-  frc2::JoystickButton(&m_driverController, 1)
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
       .WhenPressed(new GrabHatch(&m_hatch));
   // Release the hatch when the 'B' button is pressed.
-  frc2::JoystickButton(&m_driverController, 2)
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
       .WhenPressed(new ReleaseHatch(&m_hatch));
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController, 6)
+  frc2::JoystickButton(&m_driverController,
+                       frc::XboxController::Button::kBumperRight)
       .WhenHeld(new HalveDriveSpeed(&m_drive));
 }
 

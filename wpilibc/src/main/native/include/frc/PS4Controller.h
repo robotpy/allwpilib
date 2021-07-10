@@ -357,30 +357,30 @@ class PS4Controller : public GenericHID {
    */
   bool GetScreenReleased();
 
-  enum class Button {
-    kSquare = 1,
-    kCross = 2,
-    kCircle = 3,
-    kTriangle = 4,
-    kL1 = 5,
-    kR1 = 6,
-    kL2 = 7,
-    kR2 = 8,
-    kShare = 9,
-    kOptions = 10,
-    kLeftStick = 11,
-    kRightStick = 12,
-    kPS = 13,
-    kScreen = 14
+  struct Button {
+    static constexpr int kSquare = 1;
+    static constexpr int kCross = 2;
+    static constexpr int kCircle = 3;
+    static constexpr int kTriangle = 4;
+    static constexpr int kL1 = 5;
+    static constexpr int kR1 = 6;
+    static constexpr int kL2 = 7;
+    static constexpr int kR2 = 8;
+    static constexpr int kShare = 9;
+    static constexpr int kOptions = 10;
+    static constexpr int kLeftStick = 11;
+    static constexpr int kRightStick = 12;
+    static constexpr int kPS = 13;
+    static constexpr int kScreen = 14;
   };
 
-  enum class Axis {
-    kLeftX = 0,
-    kLeftY = 1,
-    kRightX = 2,
-    kRightY = 5,
-    kL2 = 3,
-    kR2 = 4
+  struct Axis {
+    static constexpr int kLeftX = 0;
+    static constexpr int kLeftY = 1;
+    static constexpr int kRightX = 2;
+    static constexpr int kRightY = 5;
+    static constexpr int kL2 = 3;
+    static constexpr int kR2 = 4;
   };
 };
 
