@@ -7,7 +7,7 @@
 #include <frc/buttons/Trigger.h>
 
 namespace frc {
-class Joystick;
+class GenericHID;
 }  // namespace frc
 
 class DoubleButton : public frc::Trigger {
