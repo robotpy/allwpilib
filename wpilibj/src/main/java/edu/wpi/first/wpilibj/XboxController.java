@@ -169,7 +169,7 @@ public class XboxController extends GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightBumperReleased() {
-    return getRawButtonPressed(Button.kBumperRight.value);
+    return getRawButtonReleased(Button.kBumperRight.value);
   }
 
   /**

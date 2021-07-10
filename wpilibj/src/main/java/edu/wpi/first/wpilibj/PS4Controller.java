@@ -142,7 +142,7 @@ public class PS4Controller extends GenericHID {
    *
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getL2PressedButton() {
+  public boolean getL2ButtonPressed() {
     return getRawButtonPressed(Button.kL2.value);
   }
 
@@ -224,7 +224,7 @@ public class PS4Controller extends GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getR1Released() {
-    return getRawButtonPressed(Button.kR1.value);
+    return getRawButtonReleased(Button.kR1.value);
   }
 
   /**
