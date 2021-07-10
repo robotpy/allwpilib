@@ -13,37 +13,37 @@ TEST(XboxControllerTests, GetX) {
   XboxController joy{2};
   sim::XboxControllerSim joysim{joy};
 
-  joysim.SetX(XboxController::kLeftHand, 0.35);
-  joysim.SetX(XboxController::kRightHand, 0.45);
+  joysim.SetLeftX(0.35);
+  joysim.SetRightX(0.45);
   joysim.NotifyNewData();
-  ASSERT_NEAR(joy.GetX(XboxController::kLeftHand), 0.35, 0.001);
-  ASSERT_NEAR(joy.GetX(XboxController::kRightHand), 0.45, 0.001);
+  ASSERT_NEAR(joy.GetLeftX(), 0.35, 0.001);
+  ASSERT_NEAR(joy.GetRightX(), 0.45, 0.001);
 }
 
 TEST(XboxControllerTests, GetBumper) {
   XboxController joy{1};
   sim::XboxControllerSim joysim{joy};
 
-  joysim.SetBumper(XboxController::kLeftHand, false);
-  joysim.SetBumper(XboxController::kRightHand, true);
+  joysim.SetLeftBumper(false);
+  joysim.SetRightBumper(true);
   joysim.NotifyNewData();
-  ASSERT_FALSE(joy.GetBumper(XboxController::kLeftHand));
-  ASSERT_TRUE(joy.GetBumper(XboxController::kRightHand));
+  ASSERT_FALSE(joy.GetLeftBumper());
+  ASSERT_TRUE(joy.GetRightBumper());
   // need to call pressed and released to clear flags
-  joy.GetBumperPressed(XboxController::kLeftHand);
-  joy.GetBumperReleased(XboxController::kLeftHand);
-  joy.GetBumperPressed(XboxController::kRightHand);
-  joy.GetBumperReleased(XboxController::kRightHand);
+  joy.GetLeftBumperPressed();
+  joy.GetLeftBumperReleased();
+  joy.GetRightBumperPressed();
+  joy.GetRightBumperReleased();
 
-  joysim.SetBumper(XboxController::kLeftHand, true);
-  joysim.SetBumper(XboxController::kRightHand, false);
+  joysim.SetLeftBumper(true);
+  joysim.SetRightBumper(false);
   joysim.NotifyNewData();
-  ASSERT_TRUE(joy.GetBumper(XboxController::kLeftHand));
-  ASSERT_TRUE(joy.GetBumperPressed(XboxController::kLeftHand));
-  ASSERT_FALSE(joy.GetBumperReleased(XboxController::kLeftHand));
-  ASSERT_FALSE(joy.GetBumper(XboxController::kRightHand));
-  ASSERT_FALSE(joy.GetBumperPressed(XboxController::kRightHand));
-  ASSERT_TRUE(joy.GetBumperReleased(XboxController::kRightHand));
+  ASSERT_TRUE(joy.GetLeftBumper());
+  ASSERT_TRUE(joy.GetLeftBumperPressed());
+  ASSERT_FALSE(joy.GetLeftBumperReleased());
+  ASSERT_FALSE(joy.GetRightBumper());
+  ASSERT_FALSE(joy.GetRightBumperPressed());
+  ASSERT_TRUE(joy.GetRightBumperReleased());
 }
 
 TEST(XboxControllerTests, GetAButton) {

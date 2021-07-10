@@ -6,14 +6,14 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.wpilibj.XboxController;
 
-/** Class to control a simulated Xbox 360 or Xbox One controller. */
-public class XboxControllerSim extends GenericHIDSim {
+/** Class to control a simulated PS4 controller. */
+public class PS4ControllerSim extends GenericHIDSim {
   /**
    * Constructs from a XboxController object.
    *
    * @param joystick controller to simulate
    */
-  public XboxControllerSim(XboxController joystick) {
+  public PS4ControllerSim(XboxController joystick) {
     super(joystick);
     setAxisCount(6);
     setButtonCount(10);
@@ -24,7 +24,7 @@ public class XboxControllerSim extends GenericHIDSim {
    *
    * @param port port number
    */
-  public XboxControllerSim(int port) {
+  public PS4ControllerSim(int port) {
     super(port);
     setAxisCount(6);
     setButtonCount(10);
