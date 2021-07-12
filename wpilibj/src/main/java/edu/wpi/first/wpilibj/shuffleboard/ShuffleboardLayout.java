@@ -14,12 +14,23 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-/** A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts. */
-public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout>
-    implements ShuffleboardContainer {
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.Sendable;
+
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
+/**
+ * A layout in a Shuffleboard tab. Layouts can contain widgets and other
+ * layouts.
+ */
+@SuppressWarnings("PMD.TooManyMethods")
+public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout> 
+  implements ShuffleboardContainer {
+
   private final ContainerHelper m_helper = new ContainerHelper(this);
 
-  ShuffleboardLayout(ShuffleboardContainer parent, String title, String type) {
+  protected ShuffleboardLayout(ShuffleboardContainer parent, String title, String type) {
     super(parent, title, requireNonNullParam(type, "type", "ShuffleboardLayout"));
   }
 
@@ -78,18 +89,21 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
   }
 
   @Override
+
   public SuppliedValueWidget<double[]> addDoubleArray(
       String title, Supplier<double[]> valueSupplier) throws IllegalArgumentException {
     return m_helper.addDoubleArray(title, valueSupplier);
   }
 
   @Override
+
   public SuppliedValueWidget<boolean[]> addBooleanArray(
       String title, Supplier<boolean[]> valueSupplier) throws IllegalArgumentException {
     return m_helper.addBooleanArray(title, valueSupplier);
   }
 
   @Override
+
   public SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addRaw(title, valueSupplier);
