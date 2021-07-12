@@ -41,8 +41,21 @@ class SendableChooser : public SendableChooserBase {
   static std::weak_ptr<U> _unwrap_smart_ptr(const std::shared_ptr<U>& value);
 
  public:
+  /**
+   * Instantiates a SendableChooser.
+   */
+  WPI_DEPRECATED("Use SendableChooser(StringRef) instead.")
   SendableChooser() = default;
+
+  /**
+   * Instantiates a SendableChooser and adds it to dashboard.
+   *
+   * @param widgetName Name of SendableChooser widget on dashboard.
+   */
+  explicit SendableChooser(std::string_view widgetName);
+
   ~SendableChooser() override = default;
+
   SendableChooser(SendableChooser&& rhs) = default;
   SendableChooser& operator=(SendableChooser&& rhs) = default;
 
