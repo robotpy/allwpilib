@@ -11,6 +11,7 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
+#include "frc/PneumaticsModuleType.h"
 
 namespace frc {
 
@@ -26,11 +27,9 @@ class DoubleSolenoid : public wpi::Sendable,
  public:
   enum Value { kOff, kForward, kReverse };
 
-  DoubleSolenoid(PneumaticsBase& module, int forwardChannel,
-                 int reverseChannel);
-  DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
-                 int reverseChannel);
-  DoubleSolenoid(std::shared_ptr<PneumaticsBase> module, int forwardChannel,
+  DoubleSolenoid(int module, PneumaticsModuleType moduleType,
+                 int forwardChannel, int reverseChannel);
+  DoubleSolenoid(PneumaticsModuleType moduleType, int forwardChannel,
                  int reverseChannel);
 
   ~DoubleSolenoid() override;
@@ -100,12 +99,12 @@ class DoubleSolenoid : public wpi::Sendable,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
+  std::shared_ptr<PneumaticsBase> m_module;
   int m_forwardChannel;  // The forward channel on the module to control.
   int m_reverseChannel;  // The reverse channel on the module to control.
   int m_forwardMask;     // The mask for the forward channel.
   int m_reverseMask;     // The mask for the reverse channel.
   int m_mask;
-  std::shared_ptr<PneumaticsBase> m_module;
 };
 
 }  // namespace frc
